@@ -1,0 +1,57 @@
+# ==========================
+# Global ignores
+# ==========================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+.env
+.env.*
+!.env.example
+
+# ==========================
+# Node / Next.js
+# ==========================
+web/node_modules/
+web/.next/
+web/out/
+web/.turbo/
+web/.vercel/
+web/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================
+# Java / Maven / Spring Boot
+# ==========================
+api/target/
+api/.classpath
+api/.project
+api/.settings/
+api/.factorypath
+api/*.iml
+
+# IntelliJ / VSCode metadata
+.idea/
+.vscode/
+
+# ==========================
+# OS / Misc
+# ==========================
+*.class
+*.jar
+*.war
+*.ear
+
+# ==========================
+# Docker / build
+# ==========================
+*.pid
+*.seed
+*.key
+*.keystore
+*.db
+docker-compose.override.yml

@@ -1,0 +1,62 @@
+# ==============================
+# General normalization
+# ==============================
+# Auto-detect text files and ensure LF line endings in repo
+* text=auto eol=lf
+
+# ==============================
+# OS / Editor consistency
+# ==============================
+# These should always be text
+*.java     text
+*.js       text
+*.ts       text
+*.tsx      text
+*.jsx      text
+*.json     text
+*.html     text
+*.css      text
+*.scss     text
+*.md       text
+*.yml      text
+*.yaml     text
+*.xml      text
+*.properties text
+
+# ==============================
+# Binary files (do NOT modify line endings)
+# ==============================
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.gif      binary
+*.ico      binary
+*.pdf      binary
+*.jar      binary
+*.zip      binary
+*.gz       binary
+*.exe      binary
+*.dll      binary
+
+# ==============================
+# GitHub linguist hints (optional)
+# ==============================
+# Helps GitHub language stats classify code properly
+web/* linguist-language=TypeScript
+api/* linguist-language=Java
+
+# ==============================
+# Merge / diff behavior
+# ==============================
+# Disable diffs for certain files
+*.lock merge=union
+package-lock.json -diff
+yarn.lock -diff
+pnpm-lock.yaml -diff
+
+# ==============================
+# Documentation convenience
+# ==============================
+# Always normalize Markdown and text files
+*.txt text eol=lf
+*.md  text eol=lf
