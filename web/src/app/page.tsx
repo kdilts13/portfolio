@@ -14,7 +14,7 @@ export default function Home() {
       .catch(() => setMessage('(failed)'));
 
     // Example: call your /api/info or /actuator/info
-    fetch('/actuator/info')
+    fetch('/api/info')
       .then((r) => r.json())
       .then(setInfo)
       .catch(() => setInfo({ error: 'failed' }));
