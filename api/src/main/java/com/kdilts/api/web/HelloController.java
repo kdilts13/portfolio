@@ -3,6 +3,7 @@ package com.kdilts.api.web;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 import java.time.Instant;
 import java.util.Map;
@@ -25,4 +26,13 @@ public class HelloController {
                 "timestamp", Instant.now().toString()
         );
     }
+
+    @GetMapping("/me")
+    public Map<String, Object> me(Authentication auth) {
+    return Map.of(
+      "authenticated", auth != null && auth.isAuthenticated(),
+      "principal", auth != null ? auth.getPrincipal() : null,
+      "authorities", auth != null ? auth.getAuthorities() : null
+    );
+  }
 }
