@@ -60,3 +60,9 @@ docker-compose.override.yml
 # Firestore data for local dev
 # ==========================
 .firebase/
+
+# ==========================
+# Firestore exports
+# ==========================
+firebase-export-*/
+firestore_export/
