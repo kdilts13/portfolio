@@ -29,6 +29,12 @@ jobs:
           service_account: ${{ vars.DEPLOYER_SA }}
           audience: https://github.com/kdilts13/portfolio
 
+      - name: Who am I?
+        run: |
+          gcloud auth list
+          gcloud config get-value account
+          gcloud config get-value project
+
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
 
