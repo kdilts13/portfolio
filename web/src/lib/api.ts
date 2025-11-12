@@ -18,8 +18,7 @@ function waitForAuthReady() {
 export async function apiFetch(path: string, init: RequestInit = {}) {
   // Wait for Firebase to finish restoring the session on this page load
   const user = auth.currentUser ?? (await waitForAuthReady());
-
-  console.log('>>> apiFetch path', `${process.env.NEXT_PUBLIC_API_BASE}${path}`);
+  const NEXT_PUBLIC_API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
   console.log('>>> user', user);
 
@@ -29,5 +28,10 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
     console.log('>>> token', token);
     headers.set('Authorization', `Bearer ${token}`);
   }
-  return fetch(`${process.env.NEXT_PUBLIC_API_BASE}${path}`, { ...init, headers });
+
+  if (NEXT_PUBLIC_API_BASE) {
+    return fetch(`${process.env.NEXT_PUBLIC_API_BASE}${path}`, { ...init, headers });
+  } else {
+    return fetch(path, { ...init, headers });
+  }
 }
