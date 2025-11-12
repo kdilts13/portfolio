@@ -6,8 +6,6 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   async rewrites() {
-    console.log('>>> rewrites API_TARGET', API_TARGET);
-
     return [
       // Proxy all frontend requests for /api/* to Spring Boot on :8080
       { source: '/api/:path*', destination: `${API_TARGET}/api/:path*` },
