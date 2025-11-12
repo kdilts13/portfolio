@@ -32,20 +32,16 @@ jobs:
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Who am I?
-        run: |
-          gcloud auth list
-          gcloud config get-value account
-          gcloud config get-value project
-
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker $GCP_REGION-docker.pkg.dev --quiet
 
-      # ===== API =====
-      - name: Build API image with Cloud Build
+      # ===== API (Docker build/push) =====
+      - name: Build & Push API image
+        working-directory: api
         run: |
-          gcloud builds submit ./api \
-            --tag "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$API_IMAGE:latest"
+          IMAGE="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$API_IMAGE:latest"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
 
       - name: Deploy API to Cloud Run
         run: |
@@ -59,18 +55,19 @@ jobs:
         id: apiurl
         run: |
           API_URL=$(gcloud run services describe api --region="$GCP_REGION" --format="value(uri)")
-          echo "API_URL=$API_URL"
           echo "API_URL=$API_URL" >> $GITHUB_OUTPUT
 
-      # ===== WEB =====
-      # Uses your web/cloudbuild.yaml to pass NEXT_PUBLIC_API_BASE at build time
-      - name: Build WEB image with Cloud Build (bakes NEXT_PUBLIC_API_BASE)
+      # ===== WEB (Docker build with build-arg) =====
+      - name: Build & Push WEB image (bakes NEXT_PUBLIC_API_BASE)
+        working-directory: web
         run: |
-          gcloud builds submit ./web \
-            --config=web/cloudbuild.yaml \
-            --substitutions=_NEXT_PUBLIC_API_BASE="${{ steps.apiurl.outputs.API_URL }}"
+          IMAGE="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$WEB_IMAGE:latest"
+          docker build \
+            --build-arg NEXT_PUBLIC_API_BASE="${{ steps.apiurl.outputs.API_URL }}" \
+            -t "$IMAGE" .
+          docker push "$IMAGE"
 
-      - name: Deploy Web to Cloud Run
+      - name: Deploy WEB to Cloud Run
         run: |
           gcloud run deploy web \
             --image="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$WEB_IMAGE:latest" \
