@@ -25,17 +25,26 @@ resource "google_artifact_registry_repository" "apps" {
   repository_id = var.ar_repo
   format        = "DOCKER"
   description   = "Containers for portfolio apps"
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Runtime service accounts (Cloud Run)
 resource "google_service_account" "run_api" {
   account_id   = "run-api"
   display_name = "Cloud Run API runtime"
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_service_account" "run_web" {
   account_id   = "run-web"
   display_name = "Cloud Run Web runtime"
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Grant Firestore access to API runtime
