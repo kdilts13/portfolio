@@ -55,7 +55,17 @@ jobs:
         id: apiurl
         run: |
           API_URL=$(gcloud run services describe api --region="$GCP_REGION" --format="value(uri)")
+          TESTVAR=$(gcloud run services describe api --region="$GCP_REGION")
+          echo ">>> GCP_REGION:"
+          echo ">>> $GCP_REGION"
+
+          echo ">>> TESTVAR:"
+          echo ">>> $TESTVAR"
+
           echo "API_URL=$API_URL" >> $GITHUB_OUTPUT
+
+          echo ">>> API_URL:"
+          echo ">>> $API_URL"
 
       # ===== WEB (Docker build with build-arg) =====
       - name: Build & Push WEB image (bakes NEXT_PUBLIC_API_BASE)
