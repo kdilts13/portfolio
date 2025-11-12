@@ -82,6 +82,10 @@ resource "google_cloud_run_v2_service" "web" {
         name  = "NODE_ENV"
         value = "production"
       }
+       env {
+        name  = "NEXT_PUBLIC_API_BASE"
+        value = "https://api-y3wnybmuqa-uc.a.run.app"
+      }
     }
   }
   depends_on = [google_artifact_registry_repository.apps]
