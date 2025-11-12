@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  emulators:
+    image: node:20-alpine
+    container_name: emulators
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+      - ./.firebase/data:/.firebase/data
+    command: >
+      sh -lc "npm i -g firebase-tools &&
+              firebase emulators:start
+              --config ./firebase.json
+              --only \"auth,firestore\"
+              --project portfolio-dev
+              --import ./.firebase/data
+              --export-on-exit
+              --ui"
+    ports:
+      - "4000:4000" # Emulator UI
+      - "8081:8081" # Firestore
+      - "9099:9099" # Auth
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ./api
+    image: portfolio-api:dev
+    container_name: api
+    environment:
+      GOOGLE_CLOUD_PROJECT: portfolio-dev
+      FIRESTORE_EMULATOR_HOST: emulators:8081
+      FIREBASE_AUTH_EMULATOR_HOST: emulators:9099
+    depends_on:
+      emulators:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://localhost:8080/actuator/health | grep -q 'UP'",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build:
+      context: ./web
+    image: portfolio-web:dev
+    container_name: web
+    environment:
+      NODE_ENV: production
+      # Web will proxy to the API container (no CORS headache)
+      API_PROXY_TARGET: http://api:8080
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
