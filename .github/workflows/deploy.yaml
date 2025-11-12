@@ -4,6 +4,11 @@ on:
   push:
     branches: ["main"]
 
+# Cancel older runs on the same branch
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
   GCP_REGION: ${{ vars.GCP_REGION }}
@@ -12,15 +17,34 @@ env:
   API_IMAGE: ${{ vars.API_IMAGE }}
 
 jobs:
-  deploy:
+  # Detect what changed so we only rebuild what's needed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'api/**'
+              - '.github/workflows/deploy.yaml'
+            web:
+              - 'web/**'
+              - '.github/workflows/deploy.yaml'
+
+  build_deploy_api:
+    if: needs.changes.outputs.api == 'true'
+    needs: changes
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
-    runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Auth to GCP via WIF
         uses: google-github-actions/auth@v2
@@ -35,13 +59,17 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker $GCP_REGION-docker.pkg.dev --quiet
 
-      # ===== API (Docker build/push) =====
-      - name: Build & Push API image
-        working-directory: api
-        run: |
-          IMAGE="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$API_IMAGE:latest"
-          docker build -t "$IMAGE" .
-          docker push "$IMAGE"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & Push API (cached)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./api
+          push: true
+          tags: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.API_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Deploy API to Cloud Run
         run: |
@@ -51,31 +79,56 @@ jobs:
             --service-account="run-api@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
             --allow-unauthenticated
 
-      - name: Get API URL
+  build_deploy_web:
+    if: needs.changes.outputs.web == 'true'
+    needs: [changes] # (API may not have changed; we can still read its URL)
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Auth to GCP via WIF
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_SA }}
+          audience: https://github.com/kdilts13/portfolio
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker $GCP_REGION-docker.pkg.dev --quiet
+
+      - name: Resolve API URL (v2/v1 formats)
         id: apiurl
         run: |
-          API_URL=$(gcloud run services describe api --region="$GCP_REGION" --format="value(status.url)")
-          TESTVAR=$(gcloud run services describe api --region="$GCP_REGION")
-          echo ">>> GCP_REGION:"
-          echo ">>> $GCP_REGION"
-
-          echo ">>> TESTVAR:"
-          echo ">>> $TESTVAR"
-
+          API_URL=$(gcloud run services describe api --region="$GCP_REGION" --format="value(uri)")
+          if [ -z "$API_URL" ]; then
+            API_URL=$(gcloud run services describe api --region="$GCP_REGION" --format="value(status.url)")
+          fi
+          if [ -z "$API_URL" ]; then
+            echo "ERROR: Could not resolve API URL" >&2
+            exit 1
+          fi
           echo "API_URL=$API_URL" >> $GITHUB_OUTPUT
 
-          echo ">>> API_URL:"
-          echo ">>> $API_URL"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # ===== WEB (Docker build with build-arg) =====
-      - name: Build & Push WEB image (bakes NEXT_PUBLIC_API_BASE)
-        working-directory: web
-        run: |
-          IMAGE="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$WEB_IMAGE:latest"
-          docker build \
-            --build-arg NEXT_PUBLIC_API_BASE="${{ steps.apiurl.outputs.API_URL }}" \
-            -t "$IMAGE" .
-          docker push "$IMAGE"
+      # Option A: client calls API directly via NEXT_PUBLIC_API_BASE
+      - name: Build & Push WEB (cached, bake NEXT_PUBLIC_API_BASE)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./web
+          push: true
+          tags: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.WEB_IMAGE }}:latest
+          build-args: |
+            NEXT_PUBLIC_API_BASE=${{ steps.apiurl.outputs.API_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Deploy WEB to Cloud Run
         run: |
