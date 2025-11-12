@@ -21,6 +21,11 @@ export default function Home() {
       .then(setMessage)
       .catch(() => setMessage('(failed)'));
 
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/hello`)
+      .then((r) => r.text())
+      .then(setMessage)
+      .catch(() => setMessage('(failed)'));
+
     // Example: call your /api/info or /actuator/info
     apiFetch('/api/info')
       .then((r) => r.json())
