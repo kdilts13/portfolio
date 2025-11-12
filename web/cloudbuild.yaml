@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/$AR_REPO/web:latest'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_API_BASE=$_NEXT_PUBLIC_API_BASE'
+      - '.'
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/$AR_REPO/web:latest'
+substitutions:
+  _NEXT_PUBLIC_API_BASE: ''

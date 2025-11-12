@@ -35,12 +35,11 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker $GCP_REGION-docker.pkg.dev --quiet
 
-      - name: Build & Push API image
-        working-directory: api
+      # ===== API =====
+      - name: Build API image with Cloud Build
         run: |
-          IMAGE="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$API_IMAGE:latest"
-          docker build -t "$IMAGE" .
-          docker push "$IMAGE"
+          gcloud builds submit ./api \
+            --tag "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$API_IMAGE:latest"
 
       - name: Deploy API to Cloud Run
         run: |
@@ -50,12 +49,20 @@ jobs:
             --service-account="run-api@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
             --allow-unauthenticated
 
-      - name: Build & Push Web image
-        working-directory: web
+      - name: Get API URL
+        id: apiurl
         run: |
-          IMAGE="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$WEB_IMAGE:latest"
-          docker build -t "$IMAGE" .
-          docker push "$IMAGE"
+          API_URL=$(gcloud run services describe api --region="$GCP_REGION" --format="value(uri)")
+          echo "API_URL=$API_URL"
+          echo "API_URL=$API_URL" >> $GITHUB_OUTPUT
+
+      # ===== WEB =====
+      # Uses your web/cloudbuild.yaml to pass NEXT_PUBLIC_API_BASE at build time
+      - name: Build WEB image with Cloud Build (bakes NEXT_PUBLIC_API_BASE)
+        run: |
+          gcloud builds submit ./web \
+            --config=web/cloudbuild.yaml \
+            --substitutions=_NEXT_PUBLIC_API_BASE="${{ steps.apiurl.outputs.API_URL }}"
 
       - name: Deploy Web to Cloud Run
         run: |
@@ -63,5 +70,4 @@ jobs:
             --image="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$WEB_IMAGE:latest" \
             --region="$GCP_REGION" \
             --service-account="run-web@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
-            --allow-unauthenticated \
-            --set-env-vars="NEXT_PUBLIC_API_BASE=https://api-y3wnybmuqa-uc.a.run.app"
+            --allow-unauthenticated
