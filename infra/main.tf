@@ -40,8 +40,9 @@ resource "google_service_account" "run_web" {
 
 # Grant Firestore access to API runtime
 resource "google_project_iam_member" "api_datastore_user" {
-  role   = "roles/datastore.user"
-  member = "serviceAccount:${google_service_account.run_api.email}"
+  project = var.project_id
+  role    = "roles/datastore.user"
+  member  = "serviceAccount:${google_service_account.run_api.email}"
 }
 
 # Cloud Run services
@@ -77,8 +78,9 @@ resource "google_cloud_run_v2_service" "web" {
   depends_on = [google_artifact_registry_repository.apps]
 }
 
-# Allow unauthenticated access
+# Allow unauthenticated access (optional to include project; harmless)
 resource "google_cloud_run_v2_service_iam_member" "web_invoker_all" {
+  project  = var.project_id
   location = var.region
   name     = google_cloud_run_v2_service.web.name
   role     = "roles/run.invoker"
@@ -86,6 +88,7 @@ resource "google_cloud_run_v2_service_iam_member" "web_invoker_all" {
 }
 
 resource "google_cloud_run_v2_service_iam_member" "api_invoker_all" {
+  project  = var.project_id
   location = var.region
   name     = google_cloud_run_v2_service.api.name
   role     = "roles/run.invoker"
