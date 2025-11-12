@@ -1,5 +1,9 @@
 # build
 FROM node:20-alpine AS deps
+
+ARG NEXT_PUBLIC_API_BASE
+ENV NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE}
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
