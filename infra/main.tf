@@ -1,0 +1,93 @@
+locals {
+  repo_path = "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repo}"
+}
+
+# Enable required services (idempotent)
+resource "google_project_service" "services" {
+  for_each = toset([
+    "run.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "iam.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "sts.googleapis.com",
+    "secretmanager.googleapis.com",
+    "firebase.googleapis.com",
+    "firestore.googleapis.com",
+    "identitytoolkit.googleapis.com",
+  ])
+  service            = each.value
+  disable_on_destroy = false
+}
+
+# Artifact Registry repo (if not yet created)
+resource "google_artifact_registry_repository" "apps" {
+  location      = var.region
+  repository_id = var.ar_repo
+  format        = "DOCKER"
+  description   = "Containers for portfolio apps"
+}
+
+# Runtime service accounts (Cloud Run)
+resource "google_service_account" "run_api" {
+  account_id   = "run-api"
+  display_name = "Cloud Run API runtime"
+}
+
+resource "google_service_account" "run_web" {
+  account_id   = "run-web"
+  display_name = "Cloud Run Web runtime"
+}
+
+# Grant Firestore access to API runtime
+resource "google_project_iam_member" "api_datastore_user" {
+  role   = "roles/datastore.user"
+  member = "serviceAccount:${google_service_account.run_api.email}"
+}
+
+# Cloud Run services
+resource "google_cloud_run_v2_service" "api" {
+  name     = "api"
+  location = var.region
+  template {
+    service_account = google_service_account.run_api.email
+    containers {
+      image = "${local.repo_path}/${var.api_image}:latest"
+      env {
+        name  = "SPRING_PROFILES_ACTIVE"
+        value = "prod"
+      }
+    }
+  }
+  depends_on = [google_artifact_registry_repository.apps]
+}
+
+resource "google_cloud_run_v2_service" "web" {
+  name     = "web"
+  location = var.region
+  template {
+    service_account = google_service_account.run_web.email
+    containers {
+      image = "${local.repo_path}/${var.web_image}:latest"
+      env {
+        name  = "NODE_ENV"
+        value = "production"
+      }
+    }
+  }
+  depends_on = [google_artifact_registry_repository.apps]
+}
+
+# Allow unauthenticated access
+resource "google_cloud_run_v2_service_iam_member" "web_invoker_all" {
+  location = var.region
+  name     = google_cloud_run_v2_service.web.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "api_invoker_all" {
+  location = var.region
+  name     = google_cloud_run_v2_service.api.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
