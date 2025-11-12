@@ -19,6 +19,8 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
   // Wait for Firebase to finish restoring the session on this page load
   const user = auth.currentUser ?? (await waitForAuthReady());
 
+  console.log('>>> apiFetch path', path);
+
   console.log('>>> user', user);
 
   const headers = new Headers(init.headers);

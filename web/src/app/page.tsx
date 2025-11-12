@@ -8,7 +8,6 @@ export default function Home() {
   const [info, setInfo] = useState<any>(null);
 
   useEffect(() => {
-    console.log('>>> process.env', process.env);
     console.log('>>> process.env.NEXT_PUBLIC_API_BASE', process.env.NEXT_PUBLIC_API_BASE);
 
     // Because of next.config rewrites, this hits Spring Boot at :8080
