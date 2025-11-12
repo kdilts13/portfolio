@@ -8,20 +8,8 @@ export default function Home() {
   const [info, setInfo] = useState<any>(null);
 
   useEffect(() => {
-    console.log('>>> process.env.NEXT_PUBLIC_API_BASE', process.env.NEXT_PUBLIC_API_BASE);
-
     // Because of next.config rewrites, this hits Spring Boot at :8080
     apiFetch('/api/hello')
-      .then((r) => r.text())
-      .then(setMessage)
-      .catch(() => setMessage('(failed)'));
-
-    fetch('/api/hello')
-      .then((r) => r.text())
-      .then(setMessage)
-      .catch(() => setMessage('(failed)'));
-
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/hello`)
       .then((r) => r.text())
       .then(setMessage)
       .catch(() => setMessage('(failed)'));
