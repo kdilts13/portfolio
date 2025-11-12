@@ -1,18 +1,22 @@
-# build
+# build deps
 FROM node:20-alpine AS deps
-
-ARG NEXT_PUBLIC_API_BASE
-ENV NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE}
-
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+# build app (inject NEXT_PUBLIC_* here)
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# `API_PROXY_TARGET` injected at runtime in Cloud Run; keep rewrites in next.config.ts
+
+# Accept and expose the build-time public env var
+ARG NEXT_PUBLIC_API_BASE
+ENV NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE}
+# (optional) debug
+RUN echo "NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE}"
+
+# Build - this is where NEXT_PUBLIC_* gets inlined into the client bundle
 RUN npm run build
 
 # run
