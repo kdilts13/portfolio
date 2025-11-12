@@ -129,3 +129,15 @@ resource "google_project_iam_member" "gh_storage_object_admin" {
   role    = "roles/storage.objectAdmin"
   member  = "serviceAccount:gh-deployer@${var.project_id}.iam.gserviceaccount.com"
 }
+
+# Cloud Build source bucket (already created by the first build)
+data "google_storage_bucket" "cloudbuild_src" {
+  name = "${var.project_id}_cloudbuild"
+}
+
+# Give gh-deployer full control on that bucket only
+resource "google_storage_bucket_iam_member" "gh_build_bucket_admin" {
+  bucket = data.google_storage_bucket.cloudbuild_src.name
+  role   = "roles/storage.admin"
+  member = "serviceAccount:gh-deployer@${var.project_id}.iam.gserviceaccount.com"
+}
