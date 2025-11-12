@@ -8,13 +8,13 @@ export default function Home() {
 
   useEffect(() => {
     // Because of next.config rewrites, this hits Spring Boot at :8080
-    fetch('/api/hello')
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/hello`)
       .then((r) => r.text())
       .then(setMessage)
       .catch(() => setMessage('(failed)'));
 
     // Example: call your /api/info or /actuator/info
-    fetch('/api/info')
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/info`)
       .then((r) => r.json())
       .then(setInfo)
       .catch(() => setInfo({ error: 'failed' }));
