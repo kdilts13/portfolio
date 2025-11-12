@@ -107,3 +107,25 @@ resource "google_cloud_run_v2_service_iam_member" "api_invoker_all" {
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
+
+# === CI/CD permissions for gh-deployer (GitHub Actions) ===
+# Allows creating/running Cloud Build jobs
+resource "google_project_iam_member" "gh_cb_builds_editor" {
+  project = var.project_id
+  role    = "roles/cloudbuild.builds.editor"
+  member  = "serviceAccount:gh-deployer@${var.project_id}.iam.gserviceaccount.com"
+}
+
+# Allows calling enabled services (fixes serviceusage.services.use)
+resource "google_project_iam_member" "gh_serviceusage_consumer" {
+  project = var.project_id
+  role    = "roles/serviceusage.serviceUsageConsumer"
+  member  = "serviceAccount:gh-deployer@${var.project_id}.iam.gserviceaccount.com"
+}
+
+# Allows uploading source tarballs to the Cloud Build GCS bucket
+resource "google_project_iam_member" "gh_storage_object_admin" {
+  project = var.project_id
+  role    = "roles/storage.objectAdmin"
+  member  = "serviceAccount:gh-deployer@${var.project_id}.iam.gserviceaccount.com"
+}
