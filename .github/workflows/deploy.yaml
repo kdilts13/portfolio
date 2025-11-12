@@ -54,7 +54,7 @@ jobs:
       - name: Get API URL
         id: apiurl
         run: |
-          API_URL=$(gcloud run services describe api --region="$GCP_REGION" --format="value(uri)")
+          API_URL=$(gcloud run services describe api --region="$GCP_REGION" --format="value(status.url)")
           TESTVAR=$(gcloud run services describe api --region="$GCP_REGION")
           echo ">>> GCP_REGION:"
           echo ">>> $GCP_REGION"
