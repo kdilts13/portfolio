@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/api';
 
 export default function Home() {
   const [message, setMessage] = useState<string>('(loading...)');
@@ -11,13 +12,13 @@ export default function Home() {
     console.log('>>> process.env.NEXT_PUBLIC_API_BASE', process.env.NEXT_PUBLIC_API_BASE);
 
     // Because of next.config rewrites, this hits Spring Boot at :8080
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/hello`)
+    apiFetch('/api/hello')
       .then((r) => r.text())
       .then(setMessage)
       .catch(() => setMessage('(failed)'));
 
     // Example: call your /api/info or /actuator/info
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/info`)
+    apiFetch('/api/info')
       .then((r) => r.json())
       .then(setInfo)
       .catch(() => setInfo({ error: 'failed' }));
