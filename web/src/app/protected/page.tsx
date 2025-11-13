@@ -12,7 +12,7 @@ export default function ProtectedPage() {
     if (loading) return;
 
     if (user) {
-      apiFetch('/api/projects', {}, user)
+      apiFetch('/api/projects', user)
         .then(async (r) => {
           if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
           setData(await r.json());

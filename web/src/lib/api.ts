@@ -1,7 +1,7 @@
 'use client';
 import { getIdToken, User } from 'firebase/auth';
 
-export async function apiFetch(path: string, init: RequestInit = {}, user: User) {
+export async function apiFetch(path: string, user: User | null, init: RequestInit = {}) {
   const NEXT_PUBLIC_API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
   const headers = new Headers(init.headers);
@@ -25,7 +25,7 @@ type MeResponse = {
 
 export async function fetchMe(user: User): Promise<MeResponse | null> {
   try {
-    const res = await apiFetch('/api/me', {}, user);
+    const res = await apiFetch('/api/me', user);
     if (!res.ok) {
       return null;
     }

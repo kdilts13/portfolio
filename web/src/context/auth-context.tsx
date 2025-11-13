@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // We have a Firebase user -> fetch /api/me once
       try {
-        const res = await apiFetch('/api/me', {}, user);
+        const res = await apiFetch('/api/me', user);
         if (!res.ok) {
           // If backend says 401/403/etc, just clear me
           setState({ user, me: null, loading: false });
