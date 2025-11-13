@@ -31,12 +31,16 @@ public class SecurityConfig {
                     "/api/me",
                     "/actuator/**"
                 ).permitAll()
-                // Everything else under /api/** must be authenticated
+
+                // Endpoints that require *approved* users
+                .requestMatchers("/api/projects/**").hasRole("APPROVED")
+
+                // Fallback for other API calls: must be authenticated at least
                 .requestMatchers("/api/**").authenticated()
-                // Any non-API routes – you can adjust this as needed
+
+                // Everything else (non-API) is public
                 .anyRequest().permitAll()
             )
-            // Insert our Firebase filter before UsernamePasswordAuthenticationFilter
             .addFilterBefore(firebaseAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
