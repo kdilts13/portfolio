@@ -1,23 +1,7 @@
 'use client';
-import { auth } from '@/lib/firebase';
-import { getIdToken, onAuthStateChanged, User } from 'firebase/auth';
+import { getIdToken, User } from 'firebase/auth';
 
-let authReady: Promise<User | null> | null = null;
-function waitForAuthReady() {
-  if (!authReady) {
-    authReady = new Promise<User | null>((resolve) => {
-      const unsub = onAuthStateChanged(auth, (u) => {
-        unsub();
-        resolve(u);
-      });
-    });
-  }
-  return authReady;
-}
-
-export async function apiFetch(path: string, init: RequestInit = {}) {
-  // Wait for Firebase to finish restoring the session on this page load
-  const user = auth.currentUser ?? (await waitForAuthReady());
+export async function apiFetch(path: string, init: RequestInit = {}, user: User) {
   const NEXT_PUBLIC_API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
   const headers = new Headers(init.headers);
@@ -39,9 +23,9 @@ type MeResponse = {
   approved: boolean;
 };
 
-export async function fetchMe(): Promise<MeResponse | null> {
+export async function fetchMe(user: User): Promise<MeResponse | null> {
   try {
-    const res = await apiFetch('/api/me');
+    const res = await apiFetch('/api/me', {}, user);
     if (!res.ok) {
       return null;
     }

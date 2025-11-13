@@ -1,19 +1,25 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
+import { useAuth } from '@/context/auth-context';
 
 export default function ProtectedPage() {
   const [data, setData] = useState<any>(null);
   const [err, setErr] = useState<string | null>(null);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    apiFetch('/api/projects')
-      .then(async (r) => {
-        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-        setData(await r.json());
-      })
-      .catch((e) => setErr(e.message));
-  }, []);
+    if (loading) return;
+
+    if (user) {
+      apiFetch('/api/projects', {}, user)
+        .then(async (r) => {
+          if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+          setData(await r.json());
+        })
+        .catch((e) => setErr(e.message));
+    }
+  }, [user, loading]);
 
   return (
     <main className="p-6 space-y-4">

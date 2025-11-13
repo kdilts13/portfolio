@@ -1,25 +1,25 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
-export default function ProtectedPage() {
-  const [loading, setLoading] = useState(true);
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
+
+export default function LoggedInOnlyPage() {
   const router = useRouter();
+  const { user, me, loading } = useAuth();
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        router.push('/login'); // redirect to /login
-      } else {
-        setLoading(false); // user is logged in, render content
-      }
-    });
-    return unsub;
-  }, [router]);
+    if (loading) return;
 
-  if (loading) return <main className="p-6">Loading…</main>;
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+  }, [user, me, loading, router]);
 
-  return <main className="p-6">This is a protected page.</main>;
+  if (loading || !user) {
+    return <div>Loading...</div>;
+  }
+
+  return <div>logged in only content here</div>;
 }
