@@ -7,8 +7,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,8 +19,6 @@ import java.util.List;
 
 @Component
 public class FirebaseAuthFilter extends OncePerRequestFilter {
-
-    private static final Logger log = LoggerFactory.getLogger(FirebaseAuthFilter.class);
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -43,11 +39,8 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Missing or invalid Authorization header on {}", path);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
@@ -56,9 +49,6 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
 
         try {
             FirebaseToken decoded = FirebaseAuth.getInstance().verifyIdToken(idToken);
-
-            // For debugging – you already saw this working
-            log.warn(">>> decoded.getUid(): {}", decoded.getUid());
 
             // Create an Authentication and put it into the SecurityContext
             var authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
@@ -74,7 +64,6 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (FirebaseAuthException e) {
-            log.warn("Firebase token verification failed on {}: {}", path, e.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }

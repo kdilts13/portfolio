@@ -20,12 +20,9 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
   const user = auth.currentUser ?? (await waitForAuthReady());
   const NEXT_PUBLIC_API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
-  console.log('>>> user', user);
-
   const headers = new Headers(init.headers);
   if (user) {
     const token = await getIdToken(user, false);
-    console.log('>>> token', token);
     headers.set('Authorization', `Bearer ${token}`);
   }
 
