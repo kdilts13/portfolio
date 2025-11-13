@@ -14,6 +14,11 @@ export default function Home() {
       .then(setMessage)
       .catch(() => setMessage('(failed)'));
 
+    apiFetch('/api/me')
+      .then((r) => r.text())
+      .then((data) => console.log('>>> data', data))
+      .catch(() => setMessage('(failed)'));
+
     // Example: call your /api/info or /actuator/info
     apiFetch('/api/info')
       .then((r) => r.json())

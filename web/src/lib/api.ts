@@ -32,3 +32,21 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
     return fetch(path, { ...init, headers });
   }
 }
+
+type MeResponse = {
+  uid: string;
+  email: string;
+  approved: boolean;
+};
+
+export async function fetchMe(): Promise<MeResponse | null> {
+  try {
+    const res = await apiFetch('/api/me');
+    if (!res.ok) {
+      return null;
+    }
+    return (await res.json()) as MeResponse;
+  } catch {
+    return null;
+  }
+}

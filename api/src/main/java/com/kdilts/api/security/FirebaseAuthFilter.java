@@ -37,7 +37,6 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
         // Public endpoints
         return path.startsWith("/api/hello")
                 || path.startsWith("/api/info")
-                || path.startsWith("/api/me")
                 || path.startsWith("/actuator")
                 || path.equals("/")
                 || path.startsWith("/error");
@@ -104,8 +103,10 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Optionally attach uid for controllers
+            // Attach attributes for controllers
             request.setAttribute("firebaseUid", uid);
+            request.setAttribute("firebaseApproved", approved);
+            request.setAttribute("firebaseEmail", email);
 
             if (!approved) {
                 log.warn("User uid={} email={} is not approved", uid, email);

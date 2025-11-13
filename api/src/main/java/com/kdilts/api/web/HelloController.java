@@ -3,10 +3,18 @@ package com.kdilts.api.web;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-
+import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.Instant;
 import java.util.Map;
+
+record MeResponse(
+    String uid,
+    String email,
+    boolean approved
+) {}
 
 @RestController
 @RequestMapping("/api")
@@ -28,11 +36,19 @@ public class HelloController {
     }
 
     @GetMapping("/me")
-    public Map<String, Object> me(Authentication auth) {
-    return Map.of(
-      "authenticated", auth != null && auth.isAuthenticated(),
-      "principal", auth != null ? auth.getPrincipal() : null,
-      "authorities", auth != null ? auth.getAuthorities() : null
-    );
-  }
+    public ResponseEntity<MeResponse> me(HttpServletRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String uid = (String) request.getAttribute("firebaseUid");
+        String email = (String) request.getAttribute("firebaseEmail");
+        Boolean approved = (Boolean) request.getAttribute("firebaseApproved");
+        if (approved == null) {
+            approved = false;
+        }
+
+        return ResponseEntity.ok(new MeResponse(uid, email, approved));
+    }
 }

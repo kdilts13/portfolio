@@ -28,7 +28,6 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/hello",
                     "/api/info",
-                    "/api/me",
                     "/actuator/**"
                 ).permitAll()
 
@@ -36,6 +35,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/projects/**").hasRole("APPROVED")
 
                 // Fallback for other API calls: must be authenticated at least
+                .requestMatchers("/api/me").authenticated()
                 .requestMatchers("/api/**").authenticated()
 
                 // Everything else (non-API) is public
