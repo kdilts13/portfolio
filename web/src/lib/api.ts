@@ -1,7 +1,7 @@
 'use client';
 import { getIdToken, User } from 'firebase/auth';
 
-export async function apiFetch(path: string, user: User | null, init: RequestInit = {}) {
+export async function apiFetch(path: string, user: User | null = null, init: RequestInit = {}) {
   const NEXT_PUBLIC_API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
   const headers = new Headers(init.headers);
