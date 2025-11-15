@@ -1,78 +1,149 @@
-# ==========================
-# Global ignores
-# ==========================
+############################################################
+# GLOBAL / SHARED
+############################################################
+
+# OS junk
 .DS_Store
 Thumbs.db
+
+# Logs / temp
 *.log
 *.tmp
 *.swp
 *.swo
+
+# Env files (never commit real secrets)
 .env
 .env.*
 !.env.example
 
-# ==========================
-# Node / Next.js
-# ==========================
-web/node_modules/
-web/.next/
-web/out/
-web/.turbo/
-web/.vercel/
-web/dist/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# ==========================
-# Java / Maven / Spring Boot
-# ==========================
-api/target/
-api/.classpath
-api/.project
-api/.settings/
-api/.factorypath
-api/*.iml
-
-# IntelliJ / VSCode metadata
+# Editor metadata
 .idea/
 .vscode/
 
-# ==========================
-# OS / Misc
-# ==========================
+# Generic compiled artifacts
 *.class
 *.jar
 *.war
 *.ear
 
-# ==========================
-# Docker / build
-# ==========================
+# Keys / sensitive
 *.pid
 *.seed
 *.key
 *.keystore
 *.db
+*.pem
+
+# Local docker override (optional)
 docker-compose.override.yml
 
-# ==========================
-# Firestore data for local dev
-# ==========================
+
+############################################################
+# WEB (Next.js / Node / TypeScript)
+############################################################
+
+# Dependencies
+web/node_modules/
+web/.pnp
+web/.pnp.*
+web/.yarn/*
+!web/.yarn/patches
+!web/.yarn/plugins
+!web/.yarn/releases
+!web/.yarn/versions
+
+# Testing
+web/coverage/
+
+# Next.js build output
+web/.next/
+web/out/
+
+# Production build
+web/build/
+web/dist/
+
+# Vercel / Turbopack
+web/.vercel/
+web/.turbo/
+
+# Debug logs
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/.pnpm-debug.log*
+
+# TypeScript
+web/*.tsbuildinfo
+web/next-env.d.ts
+
+
+############################################################
+# API (Spring Boot / Java / Maven)
+############################################################
+
+# Spring Initializr helper
+api/HELP.md
+
+# Build output
+api/target/
+!api/**/src/main/**/target/
+!api/**/src/test/**/target/
+
+# Maven wrapper jar
+api/.mvn/wrapper/maven-wrapper.jar
+
+# STS / Eclipse
+api/.apt_generated
+api/.classpath
+api/.factorypath
+api/.project
+api/.settings
+api/.springBeans
+api/.sts4-cache
+
+# IntelliJ IDEA project files
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+api/nbproject/private/
+api/nbbuild/
+api/dist/
+api/nbdist/
+api/.nb-gradle/
+api/build/
+!api/**/src/main/**/build/
+!api/**/src/test/**/build/
+
+# VS Code (if using a separate folder-level config)
+api/.vscode/
+
+
+############################################################
+# FIREBASE / FIRESTORE (LOCAL DEV)
+############################################################
+
+# Firebase emulator state
 .firebase/
 
-# ==========================
-# Firestore exports
-# ==========================
+# Firestore exports / debug
 firebase-export-*/
 firestore_export/
+firestore-debug.log
+ui-debug.log
 
-# ==========================
-# Terraform local state and caches
-# ==========================
+
+############################################################
+# TERRAFORM (INFRA/)
+############################################################
+
 .terraform/
 *.tfstate
 *.tfstate.backup
+*.tfvars
 terraform.tfstate.d/
 crash.log
 override.tf
