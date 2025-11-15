@@ -17,7 +17,6 @@ env:
   API_IMAGE: ${{ vars.API_IMAGE }}
 
 jobs:
-  # Detect what changed so we only rebuild what's needed
   changes:
     runs-on: ubuntu-latest
     outputs:
@@ -36,13 +35,10 @@ jobs:
               - 'web/**'
               - '.github/workflows/deploy.yaml'
 
-  build_deploy_api:
+  test_api:
     if: needs.changes.outputs.api == 'true'
     needs: changes
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -60,6 +56,16 @@ jobs:
       - name: Run API unit tests
         working-directory: api
         run: ./mvnw test
+
+  build_deploy_api:
+    if: needs.changes.outputs.api == 'true'
+    needs: [changes, test_api]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Auth to GCP via WIF
         uses: google-github-actions/auth@v2
@@ -94,13 +100,10 @@ jobs:
             --service-account="run-api@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
             --allow-unauthenticated
 
-  build_deploy_web:
+  test_web:
     if: needs.changes.outputs.web == 'true'
-    needs: [changes]
+    needs: changes
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -118,6 +121,16 @@ jobs:
       - name: Run web unit tests
         working-directory: web
         run: npm test
+
+  build_deploy_web:
+    if: needs.changes.outputs.web == 'true'
+    needs: [changes, test_web]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Auth to GCP via WIF
         uses: google-github-actions/auth@v2
