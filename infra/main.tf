@@ -58,38 +58,60 @@ resource "google_project_iam_member" "api_datastore_user" {
 resource "google_cloud_run_v2_service" "api" {
   name     = "api"
   location = var.region
+
   template {
     service_account = google_service_account.run_api.email
+
+    # Scale-to-zero + cap max instances
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 3
+    }
+
     containers {
       image = "${local.repo_path}/${var.api_image}:latest"
+
       env {
         name  = "SPRING_PROFILES_ACTIVE"
         value = "prod"
       }
     }
   }
+
   depends_on = [google_artifact_registry_repository.apps]
 }
 
 resource "google_cloud_run_v2_service" "web" {
   name     = "web"
   location = var.region
+
   template {
     service_account = google_service_account.run_web.email
+
+    # Scale-to-zero + cap max instances
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 3
+    }
+
     containers {
       image = "${local.repo_path}/${var.web_image}:latest"
+
       env {
         name  = "NODE_ENV"
         value = "production"
       }
-       env {
+
+      env {
         name  = "NEXT_PUBLIC_API_BASE"
         value = "https://api-y3wnybmuqa-uc.a.run.app"
       }
     }
   }
+
   depends_on = [google_artifact_registry_repository.apps]
 }
+
 
 # Allow unauthenticated access (optional to include project; harmless)
 resource "google_cloud_run_v2_service_iam_member" "web_invoker_all" {
