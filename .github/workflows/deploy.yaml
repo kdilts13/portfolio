@@ -46,6 +46,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "maven"
+
+      - name: Make Maven wrapper executable
+        working-directory: api
+        run: chmod +x mvnw
+
+      - name: Run API unit tests
+        working-directory: api
+        run: ./mvnw test
+
       - name: Auth to GCP via WIF
         uses: google-github-actions/auth@v2
         with:
@@ -89,7 +104,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # NEW: set up Node for running Jest in web/
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -97,12 +111,10 @@ jobs:
           cache: "npm"
           cache-dependency-path: web/package-lock.json
 
-      # NEW: install web dependencies
       - name: Install web dependencies
         working-directory: web
         run: npm ci
 
-      # NEW: run web unit tests (fails job if tests fail)
       - name: Run web unit tests
         working-directory: web
         run: npm test
