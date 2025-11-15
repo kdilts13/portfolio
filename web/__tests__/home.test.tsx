@@ -16,7 +16,7 @@ describe('Home page', () => {
     render(<Home />);
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /not there/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /portfolio/i })).toBeInTheDocument();
     });
   });
 });
