@@ -5,15 +5,15 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import com.google.cloud.firestore.Firestore;
 import com.kdilts.api.config.FirebaseAdminConfig;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(properties = "spring.main.allow-bean-definition-overriding=true")
 @AutoConfigureMockMvc  // full context + real security filter chain
 class SecurityIntegrationTest {
 
@@ -26,7 +26,14 @@ class SecurityIntegrationTest {
 
         @Bean
         FirebaseAdminConfig firebaseAdminConfig() {
+            // Prevents ADC/Firebase init from running in tests
             return Mockito.mock(FirebaseAdminConfig.class);
+        }
+
+        @Bean
+        Firestore firestore() {
+            // Prevents FirestoreOptions.getDefaultInstance() from running in tests
+            return Mockito.mock(Firestore.class);
         }
     }
 
