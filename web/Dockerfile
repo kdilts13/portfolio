@@ -1,44 +1,16 @@
-# build deps
-FROM node:20-alpine AS deps
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+# Simple runtime image: Next.js has already been built in CI
+FROM node:20-alpine AS runner
 
-# build app (inject NEXT_PUBLIC_* here)
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# Accept and expose the build-time public env var
-ARG NEXT_PUBLIC_API_BASE
-ENV NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE}
-
-ARG NEXT_PUBLIC_FIREBASE_API_KEY
-ARG NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-ARG NEXT_PUBLIC_FIREBASE_PROJECT_ID
-ARG NEXT_PUBLIC_FIREBASE_APP_ID
-ARG NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-
-ENV NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY}
-ENV NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
-ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
-ENV NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID}
-ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
-
-# (optional) debug
-RUN echo "NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE}"
-
-# Build - this is where NEXT_PUBLIC_* gets inlined into the client bundle
-RUN npm run build
-
-# run
-FROM node:20-alpine
 ENV NODE_ENV=production
 WORKDIR /app
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
-COPY --from=build /app/package*.json ./
+
+# Copy package metadata and install only prod deps
+COPY package*.json ./
 RUN npm ci --omit=dev
+
+# Copy prebuilt Next.js output and public assets
+COPY .next ./.next
+COPY public ./public
+
 EXPOSE 3000
-CMD ["npm","start"]
+CMD ["npm", "start"]
