@@ -9,19 +9,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.kdilts.api.web.HelloController;
+import com.kdilts.api.web.ApiController;
 
-@WebMvcTest(HelloController.class)
+@WebMvcTest(ApiController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class HelloControllerTest {
+class ApiControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    void helloEndpointReturnsMessage() throws Exception {
-        mockMvc.perform(get("/api/hello"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Hello from Spring Boot 👋"));
+    void meEndpointReturnsNotAuthorized() throws Exception {
+        mockMvc.perform(get("/api/me"))
+                .andExpect(status().isUnauthorized());
     }
 }

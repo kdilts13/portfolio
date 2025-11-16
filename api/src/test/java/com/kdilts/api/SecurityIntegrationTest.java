@@ -38,12 +38,6 @@ class SecurityIntegrationTest {
     }
 
     @Test
-    void helloEndpointIsPublic() throws Exception {
-        mockMvc.perform(get("/api/hello"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     void meEndpointRequiresAuth() throws Exception {
         mockMvc.perform(get("/api/me"))
                 .andExpect(status().isUnauthorized());

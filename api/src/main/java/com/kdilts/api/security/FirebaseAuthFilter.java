@@ -35,11 +35,7 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         // Public endpoints
-        return path.startsWith("/api/hello")
-                || path.startsWith("/api/info")
-                || path.startsWith("/actuator")
-                || path.equals("/")
-                || path.startsWith("/error");
+        return path.equals("/") || path.startsWith("/error");
     }
 
     @Override

@@ -1,5 +1,7 @@
 'use client';
+
 import { auth } from '@/lib/firebase';
+
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -10,6 +12,7 @@ import {
   onAuthStateChanged,
   User,
 } from 'firebase/auth';
+
 import { useEffect, useState } from 'react';
 
 export default function LoginPage() {

@@ -25,14 +25,10 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
-                .requestMatchers(
-                    "/api/hello",
-                    "/api/info",
-                    "/actuator/**"
-                ).permitAll()
+                // .requestMatchers().permitAll()
 
                 // Endpoints that require *approved* users
-                .requestMatchers("/api/projects/**").hasRole("APPROVED")
+                // .requestMatchers().hasRole("APPROVED")
 
                 // Fallback for other API calls: must be authenticated at least
                 .requestMatchers("/api/me").authenticated()

@@ -7,8 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import java.time.Instant;
-import java.util.Map;
 
 record MeResponse(
     String uid,
@@ -18,23 +16,7 @@ record MeResponse(
 
 @RestController
 @RequestMapping("/api")
-public class HelloController {
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello from Spring Boot 👋";
-    }
-
-    // Optional: a simple JSON info endpoint (separate from Actuator /info)
-    @GetMapping("/info")
-    public Map<String, Object> info() {
-        return Map.of(
-                "service", "portfolio-api",
-                "version", "1.0.0",
-                "timestamp", Instant.now().toString()
-        );
-    }
-
+public class ApiController {
     @GetMapping("/me")
     public ResponseEntity<MeResponse> me(HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
