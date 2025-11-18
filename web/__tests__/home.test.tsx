@@ -5,6 +5,6 @@ describe('Home page', () => {
   it('renders the Portfolio heading', async () => {
     render(<Home />);
 
-    expect(screen.getByRole('heading', { name: /portfolio/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Kevin Dilts/i })).toBeInTheDocument();
   });
 });
