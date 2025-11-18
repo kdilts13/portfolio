@@ -1,26 +1,54 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #111315;
+  --foreground: #f2f2f2;
+
+  --card: #1a1d21;
+  --muted: #7d828a;
+  --accent: #7d828a;
+
+  --primary-green: #2ecc71;
+  --primary-blue: #3498db;
+
+  --body: #d8d8d8;
 }
 
 @theme inline {
+  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-body: var(--body);
+
+  --color-primary: var(--primary-green);
+  --color-primary-green: var(--primary-green);
+  --color-primary-blue: var(--primary-blue);
+
+  /* Radii: use 14px for the main cards */
+  --radius-lg: 14px;
+  --radius-xl: 14px;
+
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-poppins);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base element styling */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Reusable "card" + "pill button" styles */
+@layer components {
+  .card {
+    @apply rounded-lg bg-card shadow-sm;
+  }
+
+  .pill-button {
+    @apply inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium transition-colors;
+  }
 }

@@ -5,13 +5,13 @@ export default function Hero() {
     <section className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
       {/* Left side: intro */}
       <div className="space-y-4">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#4B5563]">
+        <p className="text-sm font-medium uppercase tracking-[0.2em] text-accent">
           Software Engineer
         </p>
         <h1 className="text-3xl font-semibold sm:text-4xl lg:text-5xl">
-          Hi, I&apos;m <span className="text-[#3B82F6]">Kevin Dilts</span>.
+          Hi, I&apos;m <span className="text-primary-blue">Kevin Dilts</span>.
         </h1>
-        <p className="max-w-xl text-sm text-[#9CA3AF] sm:text-base">
+        <p className="max-w-xl text-sm text-body sm:text-base">
           Full-stack engineer who enjoys building clean UIs, reliable APIs, and practical tools. I
           like working with Next.js, TypeScript, and Java on cloud-native systems.
         </p>
@@ -19,17 +19,16 @@ export default function Hero() {
         <div className="flex flex-wrap gap-3 pt-2">
           <a
             href="#projects"
-            className="inline-flex items-center justify-center rounded-full bg-[#3B82F6] px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#2563EB] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6]"
+            className="pill-button bg-primary-green text-background hover:bg-primary-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue"
           >
             View my work
           </a>
+
           <a
-            href="/resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-full border border-[#4B5563] px-5 py-2 text-sm font-medium text-[#E5E7EB] hover:border-[#6B7280] hover:bg-[#161A20]"
+            href="#contact"
+            className="pill-button border border-accent text-muted hover:border-primary-blue hover:text-foreground"
           >
-            Download résumé
+            Get in touch
           </a>
         </div>
       </div>
