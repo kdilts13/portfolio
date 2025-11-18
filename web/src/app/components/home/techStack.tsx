@@ -1,7 +1,7 @@
 import StackGroup from '@/app/components/stackGroup';
 import SectionHeader from '@/app/components/sectionHeader';
 
-export default function Hero() {
+export default function TechStack() {
   return (
     <section id="stack" className="space-y-6">
       <SectionHeader

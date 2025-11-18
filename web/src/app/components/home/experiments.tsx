@@ -17,6 +17,7 @@ export default function Experiments() {
           tech="Next.js · OpenAI API"
           description="A loadout randomizer with AI-generated tactical briefings for each build, mixing API design with a bit of fun."
         />
+
         <ProjectCard
           title="Sandbox / Experiments"
           role="Prototypes"

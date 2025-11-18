@@ -7,7 +7,7 @@ type ProjectCardProps = {
 
 export default function ProjectCard({ title, role, tech, description }: ProjectCardProps) {
   return (
-    <article className="flex flex-col justify-between rounded-lg bg-card p-5 shadow-sm">
+    <article className="card flex flex-col justify-between">
       <div className="space-y-2">
         <h3 className="text-base font-semibold text-foreground">{title}</h3>
         <p className="text-xs font-medium text-muted">{role}</p>

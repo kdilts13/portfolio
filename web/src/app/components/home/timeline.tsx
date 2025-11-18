@@ -1,12 +1,13 @@
 import SectionHeader from '@/app/components/sectionHeader';
 
-export default function Hero() {
+export default function Timeline() {
   return (
     <section id="about" className="space-y-6">
       <SectionHeader eyebrow="About" title="Where I've been and what I'm aiming for" />
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)]">
-        <div className="space-y-4 text-sm text-[#D1D5DB]">
+        {/* Left column: narrative */}
+        <div className="space-y-4 text-sm text-body">
           <p>
             I&apos;ve spent the last several years building and maintaining full-stack systems:
             front-end work in React and Angular, back-end services in Java and Elixir, and
@@ -22,8 +23,9 @@ export default function Hero() {
           </p>
         </div>
 
-        <div className="space-y-4 rounded-2xl bg-[#161A20] p-4 text-sm text-[#E5E7EB]">
-          <h3 className="text-sm font-semibold text-white">Recent highlights</h3>
+        {/* Right column: highlights card */}
+        <div className="card space-y-4 text-sm text-body">
+          <h3 className="text-sm font-semibold text-foreground">Recent highlights</h3>
           <ul className="space-y-2">
             <li>• Building this portfolio as a production-style system on GCP.</li>
             <li>• Deepening experience with Java / Spring Boot and CI/CD pipelines.</li>

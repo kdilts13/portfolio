@@ -42,13 +42,44 @@ body {
   color: var(--foreground);
 }
 
-/* Reusable "card" + "pill button" styles */
 @layer components {
+  /* ===== Card ===== */
   .card {
-    @apply rounded-lg bg-card shadow-sm;
+    @apply rounded-lg bg-card p-5 shadow-sm border border-transparent transition-colors;
   }
 
-  .pill-button {
-    @apply inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium transition-colors;
+  .card-hover {
+    @apply hover:border-primary-blue;
+  }
+
+  /* ===== Buttons ===== */
+
+  /* Primary (green → blue on hover) */
+  .btn-primary {
+    @apply inline-flex items-center justify-center
+      rounded-full px-5 py-2 text-sm font-medium
+      bg-primary-green text-background
+      transition-colors duration-200
+      hover:bg-primary-blue
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue;
+  }
+
+  /* Outline button (blue hover) */
+  .btn-outline {
+    @apply inline-flex items-center justify-center
+      rounded-full px-5 py-2 text-sm font-medium
+      border border-accent text-muted
+      transition-colors duration-200
+      hover:border-primary-blue hover:text-foreground
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue;
+  }
+
+  /* Muted / subtle button (grey background) */
+  .btn-muted {
+    @apply inline-flex items-center justify-center
+      rounded-full px-5 py-2 text-sm font-medium
+      bg-accent/20 text-muted
+      transition-colors duration-200
+      hover:bg-accent/30 hover:text-foreground;
   }
 }
