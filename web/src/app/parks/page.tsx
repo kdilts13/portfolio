@@ -6,7 +6,6 @@ import ParkList from '@/app/components/parks/ParkList';
 import ParkMap from '@/app/components/parks/ParkMap';
 import ParkDetailsPanel from '@/app/components/parks/ParkDetailsPanel';
 
-// Temporary stub data until you hook up a real API
 const MOCK_PARKS: Park[] = [
   {
     id: 'yosemite',
@@ -48,13 +47,9 @@ export default function ParksPage() {
   const [visitedParkIds, setVisitedParkIds] = useState<string[]>([]);
   const [selectedParkSummary, setSelectedParkSummary] = useState<string | null>(null);
 
-  // Placeholder: load parks list (later this should call your backend)
   useEffect(() => {
     async function loadParks() {
-      // TODO: Replace this with a real API call, e.g.:
-      // const response = await fetch('/api/parks');
-      // const data: Park[] = await response.json();
-      // setParks(data);
+      // TODO: replace with real API call
       setParks(MOCK_PARKS);
       setSelectedParkId(MOCK_PARKS[0]?.id ?? null);
     }
@@ -62,7 +57,6 @@ export default function ParksPage() {
     loadParks();
   }, []);
 
-  // Placeholder: load summary for the selected park (e.g., from Wikipedia via your backend)
   useEffect(() => {
     if (!selectedParkId) {
       setSelectedParkSummary(null);
@@ -75,11 +69,7 @@ export default function ParksPage() {
       return;
     }
 
-    // TODO: Replace with real API call:
-    // const res = await fetch(`/api/parks/${park.id}/summary`);
-    // const { summary } = await res.json();
-    // setSelectedParkSummary(summary);
-
+    // TODO: replace with real API call
     setSelectedParkSummary(
       `This is where a short description for ${park.name} from Wikipedia or another source will appear.`,
     );
@@ -92,25 +82,26 @@ export default function ParksPage() {
   const handleToggleVisited = (parkId: string, visited: boolean) => {
     setVisitedParkIds((prev) => {
       const exists = prev.includes(parkId);
-      if (visited && !exists) {
-        return [...prev, parkId];
-      }
-      if (!visited && exists) {
-        return prev.filter((id) => id !== parkId);
-      }
+      if (visited && !exists) return [...prev, parkId];
+      if (!visited && exists) return prev.filter((id) => id !== parkId);
       return prev;
     });
 
-    // TODO: Replace this with a persistence call, e.g.:
-    // await fetch('/api/visitedParks', { method: 'POST', body: JSON.stringify({ parkId, visited }) });
+    // TODO: persist visited state via API / Firestore
   };
 
   const selectedPark = parks.find((p) => p.id === selectedParkId) ?? null;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl flex-col gap-6 px-4 py-8 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,2fr)_minmax(0,1.6fr)] lg:gap-8">
-        {/* Box 1: list */}
+      <div
+        className="
+          mx-auto max-w-6xl px-4 py-8
+          flex flex-col gap-6
+          lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)] lg:auto-rows-min lg:gap-8
+        "
+      >
+        {/* Box 1: checklist / list (left column) */}
         <ParkList
           parks={parks}
           selectedParkId={selectedParkId}
@@ -119,7 +110,7 @@ export default function ParksPage() {
           onToggleVisited={handleToggleVisited}
         />
 
-        {/* Box 2: map (will later be a real map) */}
+        {/* Box 2: map (right column) */}
         <ParkMap
           parks={parks}
           selectedParkId={selectedParkId}
@@ -128,8 +119,10 @@ export default function ParksPage() {
           onToggleVisited={handleToggleVisited}
         />
 
-        {/* Box 3: details / blurb */}
-        <ParkDetailsPanel park={selectedPark} summary={selectedParkSummary} />
+        {/* Box 3: details (full width under both) */}
+        <div className="lg:col-span-2">
+          <ParkDetailsPanel park={selectedPark} summary={selectedParkSummary} />
+        </div>
       </div>
     </main>
   );
