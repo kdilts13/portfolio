@@ -1,51 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Park } from '@/app/components/parks/types';
+import { Park, ParkWikiData } from '@/app/components/parks/types';
 import ParkList from '@/app/components/parks/ParkList';
 import ParkMap from '@/app/components/parks/ParkMap';
 import ParkDetailsPanel from '@/app/components/parks/ParkDetailsPanel';
+import { PARKS } from '@/app/data/parksData';
 
-const MOCK_PARKS: Park[] = [
-  {
-    id: 'yosemite',
-    name: 'Yosemite National Park',
-    state: 'California',
-    latitude: 37.8651,
-    longitude: -119.5383,
-    wikipediaUrl: 'https://en.wikipedia.org/wiki/Yosemite_National_Park',
-  },
-  {
-    id: 'zion',
-    name: 'Zion National Park',
-    state: 'Utah',
-    latitude: 37.2982,
-    longitude: -113.0263,
-    wikipediaUrl: 'https://en.wikipedia.org/wiki/Zion_National_Park',
-  },
-  {
-    id: 'arches',
-    name: 'Arches National Park',
-    state: 'Utah',
-    latitude: 38.7331,
-    longitude: -109.5925,
-    wikipediaUrl: 'https://en.wikipedia.org/wiki/Arches_National_Park',
-  },
-  {
-    id: 'grand-canyon',
-    name: 'Grand Canyon National Park',
-    state: 'Arizona',
-    latitude: 36.1069,
-    longitude: -112.1129,
-    wikipediaUrl: 'https://en.wikipedia.org/wiki/Grand_Canyon_National_Park',
-  },
-];
+const MOCK_PARKS: Park[] = PARKS;
 
 export default function ParksPage() {
   const [parks, setParks] = useState<Park[]>([]);
   const [selectedParkId, setSelectedParkId] = useState<string | null>(null);
   const [visitedParkIds, setVisitedParkIds] = useState<string[]>([]);
-  const [selectedParkSummary, setSelectedParkSummary] = useState<string | null>(null);
+  const [wikiData, setWikiData] = useState<ParkWikiData | null>(null);
 
   useEffect(() => {
     async function loadParks() {
@@ -59,21 +27,44 @@ export default function ParksPage() {
 
   useEffect(() => {
     if (!selectedParkId) {
-      setSelectedParkSummary(null);
+      setWikiData(null);
       return;
     }
 
-    const park = parks.find((p) => p.id === selectedParkId);
-    if (!park) {
-      setSelectedParkSummary(null);
-      return;
+    let cancelled = false;
+
+    async function loadWikipediaSummary() {
+      try {
+        const res = await fetch(`/app-api/parks/${selectedParkId}/wikipedia`);
+        if (!res.ok) {
+          if (!cancelled) setWikiData(null);
+          return;
+        }
+
+        const data: {
+          summary: string | null;
+          imageUrl: string | null;
+          pageUrl: string | null;
+        } = await res.json();
+
+        console.log('>>> data', data);
+
+        if (!cancelled) {
+          setWikiData(data ?? null);
+          // Later, if you want image + url in state, you can extend state here
+        }
+      } catch (err) {
+        console.error('Failed to load Wikipedia summary:', err);
+        if (!cancelled) setWikiData(null);
+      }
     }
 
-    // TODO: replace with real API call
-    setSelectedParkSummary(
-      `This is where a short description for ${park.name} from Wikipedia or another source will appear.`,
-    );
-  }, [selectedParkId, parks]);
+    loadWikipediaSummary();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedParkId]);
 
   const handleSelectPark = (parkId: string) => {
     setSelectedParkId(parkId);
@@ -118,7 +109,12 @@ export default function ParksPage() {
 
         {/* Box 3: details (full width under both) */}
         <div className="lg:col-span-2">
-          <ParkDetailsPanel park={selectedPark} summary={selectedParkSummary} />
+          <ParkDetailsPanel
+            park={selectedPark}
+            summary={wikiData?.summary ?? null}
+            imageUrl={wikiData?.imageUrl ?? null}
+            pageUrl={wikiData?.pageUrl ?? null}
+          />
         </div>
       </div>
     </main>

@@ -4,5 +4,11 @@ export type Park = {
   state: string;
   latitude: number;
   longitude: number;
-  wikipediaUrl?: string;
+  wikipediaSlug: string;
+};
+
+export type ParkWikiData = {
+  summary: string | null;
+  imageUrl: string | null;
+  pageUrl: string | null;
 };
