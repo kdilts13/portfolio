@@ -82,6 +82,11 @@ export default function LoginPage() {
                   className={inputClasses}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleEmailAuth();
+                    }
+                  }}
                   autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                 />
               </label>
@@ -159,7 +164,14 @@ export default function LoginPage() {
                   Resend verification email
                 </button>
               )}
-              <button type="button" className="btn-primary" onClick={() => auth.signOut()}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => {
+                  auth.signOut();
+                  setPassword('');
+                }}
+              >
                 Sign out
               </button>
             </div>
