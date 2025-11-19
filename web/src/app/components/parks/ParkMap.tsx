@@ -17,20 +17,18 @@ export default function ParkMap({
   selectedParkId,
   visitedParkIds,
   onSelectPark,
-  onToggleVisited,
 }: ParkMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<Record<string, google.maps.Marker>>({});
+  const markersRef = useRef<Record<string, google.maps.marker.AdvancedMarkerElement>>({});
   const [mapReady, setMapReady] = useState(false);
 
-  // 1) Initialize the map using the functional API
+  // 1. Initialize map using the functional API
   useEffect(() => {
     if (!mapContainerRef.current) return;
-    if (mapRef.current) return; // already initialized
+    if (mapRef.current) return;
 
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
     if (!apiKey) {
       console.error('Missing NEXT_PUBLIC_GOOGLE_MAPS_API_KEY');
       return;
@@ -40,42 +38,41 @@ export default function ParkMap({
 
     async function initMap() {
       try {
-        // Configure loader options
+        // configure API key
         setOptions({
           key: apiKey,
           v: 'weekly',
         });
 
-        // Load the Maps library
+        // load required libraries
         const { Map } = (await importLibrary('maps')) as google.maps.MapsLibrary;
+        await importLibrary('marker'); // loads AdvancedMarkerElement
 
         if (!mapContainerRef.current || cancelled) return;
 
-        const initialCenter = { lat: 39.8283, lng: -98.5795 }; // Rough center of US
-
         const map = new Map(mapContainerRef.current, {
-          center: initialCenter,
+          center: { lat: 39.8283, lng: -98.5795 }, // center of US
           zoom: 4,
           mapTypeControl: false,
-          fullscreenControl: false,
           streetViewControl: false,
+          fullscreenControl: false,
+          mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,
         });
 
         mapRef.current = map;
         setMapReady(true);
       } catch (err) {
-        console.error('Error loading Google Maps:', err);
+        console.error('Google Maps failed to load:', err);
       }
     }
 
     initMap();
-
     return () => {
       cancelled = true;
     };
   }, []);
 
-  // 2) Sync markers with parks / selected / visited
+  // 2. Sync markers (AdvancedMarkerElements)
   useEffect(() => {
     if (!mapReady) return;
     const map = mapRef.current;
@@ -84,42 +81,41 @@ export default function ParkMap({
     const markers = markersRef.current;
 
     // Remove markers for parks that no longer exist
-    for (const parkId of Object.keys(markers)) {
-      if (!parks.find((p) => p.id === parkId)) {
-        markers[parkId].setMap(null);
-        delete markers[parkId];
+    for (const id of Object.keys(markers)) {
+      if (!parks.find((p) => p.id === id)) {
+        markers[id].map = null;
+        delete markers[id];
       }
     }
 
-    // Add or update markers for current parks
     parks.forEach((park) => {
       const isSelected = park.id === selectedParkId;
       const isVisited = visitedParkIds.includes(park.id);
 
+      // Theme colors
       const fillColor = isSelected
-        ? '#3498DB' // primary blue
+        ? '#3498DB' // blue
         : isVisited
-          ? '#2ECC71' // primary green
-          : '#E5E7EB'; // neutral grey
+          ? '#2ECC71' // green
+          : '#E5E7EB'; // grey
+      const borderColor = '#111315';
 
-      const icon: google.maps.Symbol = {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: isSelected ? 7 : 5,
-        fillColor,
-        fillOpacity: 1,
-        strokeColor: '#111315',
-        strokeOpacity: 1,
-        strokeWeight: 1,
-      };
+      // Create an SVG pin using PinElement
+      const pin = new google.maps.marker.PinElement({
+        scale: isSelected ? 1.2 : 1.0,
+        background: fillColor,
+        borderColor,
+        glyphColor: '#111315',
+      });
 
       let marker = markers[park.id];
 
       if (!marker) {
-        marker = new google.maps.Marker({
-          position: { lat: park.latitude, lng: park.longitude },
+        marker = new google.maps.marker.AdvancedMarkerElement({
           map,
+          position: { lat: park.latitude, lng: park.longitude },
           title: park.name,
-          icon,
+          content: pin.element,
         });
 
         marker.addListener('click', () => {
@@ -128,17 +124,15 @@ export default function ParkMap({
 
         markers[park.id] = marker;
       } else {
-        marker.setPosition({ lat: park.latitude, lng: park.longitude });
-        marker.setIcon(icon);
+        marker.position = { lat: park.latitude, lng: park.longitude };
+        marker.content = pin.element;
       }
     });
 
-    // Optional: fit bounds around all parks
+    // Optional: fit to bounds
     if (parks.length > 0) {
       const bounds = new google.maps.LatLngBounds();
-      parks.forEach((park) => {
-        bounds.extend({ lat: park.latitude, lng: park.longitude });
-      });
+      parks.forEach((p) => bounds.extend({ lat: p.latitude, lng: p.longitude }));
       map.fitBounds(bounds);
 
       const listener = google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
@@ -151,7 +145,7 @@ export default function ParkMap({
         google.maps.event.removeListener(listener);
       };
     }
-  }, [mapReady, parks, selectedParkId, visitedParkIds, onSelectPark, onToggleVisited]);
+  }, [mapReady, parks, selectedParkId, visitedParkIds, onSelectPark]);
 
   return (
     <section className="card flex flex-col">
@@ -159,11 +153,11 @@ export default function ParkMap({
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Map</p>
         <h2 className="text-lg font-semibold text-foreground">Map view</h2>
         <p className="text-sm text-muted">
-          Click a marker to select a park. Visited parks can be tracked from the list and reflected
-          here.
+          Click a marker to select a park. Visited parks update the marker color.
         </p>
       </header>
 
+      {/* Map container */}
       <div className="mt-4 rounded-lg bg-background/40">
         <div
           ref={mapContainerRef}
