@@ -1,4 +1,5 @@
 import { Park } from '@/app/components/parks/types';
+import wikipediaUrlFromSlug from '@/lib/wikipediaUrlHelper';
 
 type ParkDetailsPanelProps = {
   park: Park | null;
@@ -6,14 +7,6 @@ type ParkDetailsPanelProps = {
   imageUrl?: string | null;
   pageUrl?: string | null;
 };
-
-function wikipediaUrlFromSlug(slug: string | undefined) {
-  if (slug) {
-    return `https://en.wikipedia.org/wiki/${slug}`;
-  } else {
-    return null;
-  }
-}
 
 export default function ParkDetailsPanel({
   park,

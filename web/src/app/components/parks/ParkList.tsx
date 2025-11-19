@@ -1,4 +1,5 @@
 import { Park } from '@/app/components/parks/types';
+import wikipediaUrlFromSlug from '@/lib/wikipediaUrlHelper';
 
 type ParkListProps = {
   parks: Park[];
@@ -42,6 +43,7 @@ export default function ParkList({
               {parksInState.map((park) => {
                 const isSelected = park.id === selectedParkId;
                 const isVisited = visitedParkIds.includes(park.id);
+                const wikipediaUrl = wikipediaUrlFromSlug(park.wikipediaSlug);
 
                 return (
                   <li
@@ -68,9 +70,9 @@ export default function ParkList({
                       <span>Visited</span>
                     </label>
 
-                    {park.wikipediaUrl && (
+                    {wikipediaUrl && (
                       <a
-                        href={park.wikipediaUrl}
+                        href={wikipediaUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-primary-blue hover:underline"
