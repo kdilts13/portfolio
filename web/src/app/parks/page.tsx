@@ -95,11 +95,8 @@ export default function ParksPage() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div
-        className="
-          mx-auto max-w-6xl px-4 py-8
-          flex flex-col gap-6
-          lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)] lg:auto-rows-min lg:gap-8
-        "
+        className={`mx-auto max-w-6xl px-4 py-8 flex flex-col gap-6 lg:grid
+          lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)] lg:auto-rows-min lg:gap-8`}
       >
         {/* Box 1: checklist / list (left column) */}
         <ParkList
