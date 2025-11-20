@@ -23,14 +23,23 @@ export default function ParkMap({
   const markersRef = useRef<Record<string, google.maps.marker.AdvancedMarkerElement>>({});
   const [mapReady, setMapReady] = useState(false);
 
+  // Track whether we've already fit the map to all parks
+  const hasFitBoundsRef = useRef(false);
+
   // 1. Initialize map using the functional API
   useEffect(() => {
     if (!mapContainerRef.current) return;
     if (mapRef.current) return;
 
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID;
+
     if (!apiKey) {
       console.error('Missing NEXT_PUBLIC_GOOGLE_MAPS_API_KEY');
+      return;
+    }
+    if (!mapId) {
+      console.error('Missing NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID (required for Advanced Markers)');
       return;
     }
 
@@ -38,25 +47,23 @@ export default function ParkMap({
 
     async function initMap() {
       try {
-        // configure API key
         setOptions({
           key: apiKey,
           v: 'weekly',
         });
 
-        // load required libraries
         const { Map } = (await importLibrary('maps')) as google.maps.MapsLibrary;
-        await importLibrary('marker'); // loads AdvancedMarkerElement
+        await importLibrary('marker'); // AdvancedMarkerElement + PinElement
 
         if (!mapContainerRef.current || cancelled) return;
 
         const map = new Map(mapContainerRef.current, {
-          center: { lat: 39.8283, lng: -98.5795 }, // center of US
+          center: { lat: 39.8283, lng: -98.5795 }, // US center
           zoom: 4,
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: false,
-          mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,
+          mapId,
         });
 
         mapRef.current = map;
@@ -72,7 +79,7 @@ export default function ParkMap({
     };
   }, []);
 
-  // 2. Sync markers (AdvancedMarkerElements)
+  // 2. Sync markers (AdvancedMarkerElements) when parks / selection / visited change
   useEffect(() => {
     if (!mapReady) return;
     const map = mapRef.current;
@@ -88,11 +95,11 @@ export default function ParkMap({
       }
     }
 
+    // Add/update markers for current parks
     parks.forEach((park) => {
       const isSelected = park.id === selectedParkId;
       const isVisited = visitedParkIds.includes(park.id);
 
-      // Theme colors
       const fillColor = isSelected
         ? '#3498DB' // blue
         : isVisited
@@ -129,23 +136,54 @@ export default function ParkMap({
       }
     });
 
-    // Optional: fit to bounds
-    if (parks.length > 0) {
+    // fit to all parks ONLY once (initial load / when parks first appear)
+    if (!hasFitBoundsRef.current && parks.length > 0) {
       const bounds = new google.maps.LatLngBounds();
       parks.forEach((p) => bounds.extend({ lat: p.latitude, lng: p.longitude }));
       map.fitBounds(bounds);
 
+      // clamp absurd zoom-in after fitBounds
       const listener = google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
         if (map.getZoom() && map.getZoom()! > 10) {
           map.setZoom(10);
         }
       });
 
+      hasFitBoundsRef.current = true;
+
       return () => {
         google.maps.event.removeListener(listener);
       };
     }
   }, [mapReady, parks, selectedParkId, visitedParkIds, onSelectPark]);
+
+  // 3. When the selected park changes, pan to it ONLY if it's not already in view,
+  //    and DO NOT change the user's zoom level.
+  useEffect(() => {
+    if (!mapReady) return;
+    if (!selectedParkId) return;
+
+    const map = mapRef.current;
+    const markers = markersRef.current;
+    if (!map) return;
+
+    const marker = markers[selectedParkId];
+    if (!marker || !marker.position) return;
+
+    const position = marker.position as google.maps.LatLng | google.maps.LatLngLiteral;
+    const bounds = map.getBounds();
+
+    // If we don't have bounds yet, just pan
+    if (!bounds) {
+      map.panTo(position);
+      return;
+    }
+
+    // Only pan if the selected marker is outside the current viewport
+    if (!bounds.contains(position as google.maps.LatLng | google.maps.LatLngLiteral)) {
+      map.panTo(position);
+    }
+  }, [mapReady, selectedParkId]);
 
   return (
     <section className="card flex flex-col">
