@@ -242,7 +242,7 @@ export const PARKS: Park[] = [
     state: 'Hawaii',
     latitude: 20.72,
     longitude: -156.17,
-    wikipediaSlug: 'Haleakal%C4%81_National_Park',
+    wikipediaSlug: 'Haleakalā_National_Park',
   },
   {
     id: 'hawai-ca-bbi-volcanoes',
@@ -250,7 +250,7 @@ export const PARKS: Park[] = [
     state: 'Hawaii',
     latitude: 19.38,
     longitude: -155.2,
-    wikipediaSlug: 'Hawai%CA%BBi_Volcanoes_National_Park',
+    wikipediaSlug: 'Hawaiʻi_Volcanoes_National_Park',
   },
   {
     id: 'hot-springs',
