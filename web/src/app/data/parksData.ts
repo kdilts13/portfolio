@@ -478,11 +478,11 @@ export const PARKS: Park[] = [
   },
   {
     id: 'wrangell-e2-80-93st-elias-national-park-and-preserve',
-    name: 'Wrangell–St. Elias',
+    name: 'Wrangell-St. Elias',
     state: 'Alaska',
     latitude: 61,
     longitude: -142,
-    wikipediaSlug: 'Wrangell%E2%80%93St._Elias_National_Park_and_Preserve',
+    wikipediaSlug: 'Wrangell-St._Elias_National_Park_and_Preserve',
   },
   {
     id: 'yellowstone',
@@ -507,5 +507,5 @@ export const PARKS: Park[] = [
     latitude: 37.3,
     longitude: -113.05,
     wikipediaSlug: 'Zion_National_Park',
-  }
+  },
 ];
