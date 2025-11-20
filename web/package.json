@@ -9,10 +9,12 @@
     "lint": "eslint",
     "fixlint": "eslint --fix",
     "format": "prettier --write .",
-    "test": "jest"
+    "test": "jest",
+    "generate:parks": "node scripts/generateParks.mts"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",
+    "cheerio": "^1.1.2",
     "firebase": "^12.5.0",
     "next": "16.0.1",
     "react": "19.2.0",
