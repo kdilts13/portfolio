@@ -47,8 +47,6 @@ export default function ParksPage() {
           pageUrl: string | null;
         } = await res.json();
 
-        console.log('>>> data', data);
-
         if (!cancelled) {
           setWikiData(data ?? null);
           // Later, if you want image + url in state, you can extend state here

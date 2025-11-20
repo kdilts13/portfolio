@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Park } from '@/app/components/parks/types';
 import wikipediaUrlFromSlug from '@/lib/wikipediaUrlHelper';
 
@@ -17,11 +18,21 @@ export default function ParkList({
   onToggleVisited,
 }: ParkListProps) {
   // Group parks by state for display
-  const parksByState = parks.reduce<Record<string, Park[]>>((acc, park) => {
-    if (!acc[park.state]) acc[park.state] = [];
-    acc[park.state].push(park);
-    return acc;
-  }, {});
+  const parksByState = useMemo(() => {
+    const byState: Record<string, Park[]> = {};
+
+    for (const park of parks) {
+      if (!byState[park.state]) byState[park.state] = [];
+      byState[park.state].push(park);
+    }
+
+    return Object.keys(byState)
+      .sort((a, b) => a.localeCompare(b))
+      .map((state) => ({
+        state,
+        parks: byState[state].slice().sort((a, b) => a.name.localeCompare(b.name)),
+      }));
+  }, [parks]);
 
   return (
     <section className="card flex flex-col">
@@ -34,7 +45,7 @@ export default function ParkList({
       </header>
 
       <div className="mt-4 max-h-[65vh] overflow-y-auto pr-2">
-        {Object.entries(parksByState).map(([state, parksInState]) => (
+        {parksByState.map(({ state, parks: parksInState }) => (
           <div key={state} className="mb-4 last:mb-0">
             <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">
               {state}
