@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Park } from '@/app/components/parks/types';
 import wikipediaUrlFromSlug from '@/lib/wikipediaUrlHelper';
 
@@ -17,6 +17,8 @@ export default function ParkList({
   onSelectPark,
   onToggleVisited,
 }: ParkListProps) {
+  const selectedItemRef = useRef<HTMLLIElement | null>(null);
+
   // Group parks by state for display
   const parksByState = useMemo(() => {
     const byState: Record<string, Park[]> = {};
@@ -33,6 +35,17 @@ export default function ParkList({
         parks: byState[state].slice().sort((a, b) => a.name.localeCompare(b.name)),
       }));
   }, [parks]);
+
+  // When the selected park changes, scroll it into view in the list
+  useEffect(() => {
+    if (!selectedParkId) return;
+    if (!selectedItemRef.current) return;
+
+    selectedItemRef.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+    });
+  }, [selectedParkId]);
 
   return (
     <section className="card flex flex-col">
@@ -59,6 +72,7 @@ export default function ParkList({
                 return (
                   <li
                     key={park.id}
+                    ref={isSelected ? selectedItemRef : null}
                     className="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-sm hover:bg-card/60"
                   >
                     <button

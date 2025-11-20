@@ -7,8 +7,6 @@ import ParkMap from '@/app/components/parks/ParkMap';
 import ParkDetailsPanel from '@/app/components/parks/ParkDetailsPanel';
 import { PARKS } from '@/app/data/parksData';
 
-const MOCK_PARKS: Park[] = PARKS;
-
 export default function ParksPage() {
   const [parks, setParks] = useState<Park[]>([]);
   const [selectedParkId, setSelectedParkId] = useState<string | null>(null);
@@ -17,9 +15,7 @@ export default function ParksPage() {
 
   useEffect(() => {
     async function loadParks() {
-      // TODO: replace with real API call
-      setParks(MOCK_PARKS);
-      setSelectedParkId(MOCK_PARKS[0]?.id ?? null);
+      setParks(PARKS);
     }
 
     loadParks();
