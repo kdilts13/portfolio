@@ -35,9 +35,10 @@ async function fetchHtml(url: string): Promise<string> {
 function parseParks(html: string): ParkRecord[] {
   const $ = cheerio.load(html);
 
-  // The first big table under the "National parks" section:
+  // The main national parks table is:
   // <table class="wikitable sortable plainrowheaders">
-  const table = $('table.wikitable').first();
+  const table = $('table.wikitable.sortable.plainrowheaders').first();
+
   if (!table.length) {
     throw new Error('Could not find parks table on Wikipedia page.');
   }
@@ -46,9 +47,11 @@ function parseParks(html: string): ParkRecord[] {
 
   table.find('tr').each((_, row) => {
     const $row = $(row);
-    const headerCell = $row.find('th[scope="row"] a').first();
+
+    // Park name + slug from the row header
+    const headerCell = $row.find('[scope="row"] a').first();
     if (!headerCell.length) {
-      return; // skip header or weird rows
+      return; // skip header row or non-data rows
     }
 
     const name = headerCell.text().trim();
@@ -57,40 +60,46 @@ function parseParks(html: string): ParkRecord[] {
 
     const wikipediaSlug = href.replace('/wiki/', '');
 
-    // Location cell is the next <td> after the image cell
-    // Row structure: [Name th] [Image td] [Location td] [Coordinates td] ...
-    const cells = $row.find('td');
-    if (cells.length < 2) {
-      return;
-    }
-
-    const locationCell = $(cells[1]); // 0 = image, 1 = location
-    const locationText = locationCell.text().trim();
-    // Wikipedia often lists "State" or "State1, State2"; we'll treat this whole thing as state
-    const state = locationText;
-
-    // Coordinates are in the next cell (cells[2]) as a geohack link with DMS and decimal
-    // Example text: "44°21′N 68°13′W / 44.35°N 68.21°W / 44.35; -68.21 ( Acadia )"
+    // Find the coordinates cell via <span class="geo">lat;lon</span>
+    const coordsSpan = $row.find('span.geo').first();
     let latitude = 0;
     let longitude = 0;
 
-    const coordsCell = $(cells[2]);
-    const coordsLink = coordsCell.find('a[href*="geohack"]').first();
-    if (coordsLink.length) {
-      const coordText = coordsLink.text();
-      const match = coordText.match(/([\-0-9.]+);\s*([\-0-9.]+)/);
-      if (match) {
-        latitude = Number(match[1]);
-        longitude = Number(match[2]);
+    if (coordsSpan.length) {
+      const geoText = coordsSpan.text().trim(); // e.g. "44.35;-68.21"
+      const [latStr, lngStr] = geoText.split(';').map((s) => s.trim());
+      if (latStr && lngStr) {
+        latitude = Number(latStr);
+        longitude = Number(lngStr);
       }
     }
 
-    // Fallback: if parsing failed, you could skip or log – for now, just log
     if (!latitude && !longitude) {
       console.warn(`Warning: could not parse coords for ${name}`);
     }
 
-    // Create a simple, URL-safe id from the name (or tweak to your liking)
+    // state
+    const stateCell = $row.children().eq(2);
+    let state = '';
+
+    // Get linked state names (handles multiple states)
+    const stateLinks = stateCell
+      .find('a[title]')
+      .map((_, el) => $(el).text().trim())
+      .get()
+      .filter(Boolean);
+
+    if (stateLinks.length > 0) {
+      state = stateLinks.join(', ');
+    } else {
+      state = stateCell.text().trim().replace(/\s+/g, ' ');
+    }
+
+    if (!state) {
+      console.warn(`Warning: could not parse state/location for ${name}`);
+    }
+
+    // Create a normalized id from the slug (or name)
     const id = wikipediaSlug
       .replace(/_National_Park$/, '')
       .replace(/[^a-zA-Z0-9]+/g, '-')
@@ -125,7 +134,7 @@ function writeParksTs(parks: ParkRecord[]) {
     .join(',\n');
 
   const ts = `// AUTO-GENERATED from ${WIKI_URL}
-// Run: node tools/generateParksTs.mts
+// Run: npm run generate:parks
 
 import type { Park } from '@/app/components/parks/types';
 
