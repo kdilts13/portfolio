@@ -129,3 +129,20 @@ resource "google_cloud_run_v2_service_iam_member" "api_invoker_all" {
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
+
+# Service account for deploying Firebase/Firestore rules from CI
+resource "google_service_account" "firebase_rules_deployer" {
+  account_id   = "firebase-rules-deployer"
+  display_name = "Firebase Rules deployer (CI)"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# IAM role so it can deploy Firestore / Firebase rules
+resource "google_project_iam_member" "firebase_rules_admin" {
+  project = var.project_id
+  role    = "roles/firebaserules.admin"
+  member  = "serviceAccount:${google_service_account.firebase_rules_deployer.email}"
+}
