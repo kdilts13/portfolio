@@ -48,7 +48,7 @@ export default function ParkList({
   }, [selectedParkId]);
 
   return (
-    <section className="card flex flex-col">
+    <section className="card flex flex-col max-h-[66vh]">
       <header className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Parks</p>
         <h2 className="text-lg font-semibold text-foreground">National Parks by state</h2>
@@ -57,7 +57,7 @@ export default function ParkList({
         </p>
       </header>
 
-      <div className="mt-4 max-h-[65vh] overflow-y-auto pr-2">
+      <div className="mt-4 flex-1 min-h-0 overflow-y-auto pr-2">
         {parksByState.map(({ state, parks: parksInState }) => (
           <div key={state} className="mb-4 last:mb-0">
             <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-accent">

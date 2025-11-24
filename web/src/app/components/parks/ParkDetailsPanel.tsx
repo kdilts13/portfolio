@@ -1,5 +1,4 @@
 import { Park } from '@/app/components/parks/types';
-import wikipediaUrlFromSlug from '@/lib/wikipediaUrlHelper';
 
 type ParkDetailsPanelProps = {
   park: Park | null;
@@ -14,81 +13,67 @@ export default function ParkDetailsPanel({
   imageUrl,
   pageUrl,
 }: ParkDetailsPanelProps) {
-  const wikipediaUrl = wikipediaUrlFromSlug(park?.wikipediaSlug);
+  const hasSelection = !!park;
 
   return (
-    <section className="card flex flex-col">
-      <header className="space-y-1">
+    <section className="card flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+      {/* Left side: text */}
+      <div className="flex-1 space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Details</p>
-        <h2 className="text-lg font-semibold text-foreground">
-          {park ? park.name : 'Select a park'}
-        </h2>
-        {park && (
-          <p className="text-xs text-muted">
-            {park.state}
-            {wikipediaUrl && (
-              <>
-                {' · '}
-                <a
-                  href={wikipediaUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-blue hover:underline"
-                >
-                  View on Wikipedia
-                </a>
-              </>
+
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-lg font-semibold text-foreground">
+            {park ? park.name : 'Select a park'}
+          </h2>
+          {park?.state && <span className="text-xs text-muted">{park.state}</span>}
+        </div>
+
+        <div className="text-sm text-muted space-y-2 max-h-[10rem] overflow-y-auto pr-1">
+          {!hasSelection && (
+            <p>
+              Choose a park from the list or the map to see a short description and link to its
+              Wikipedia page.
+            </p>
+          )}
+
+          {hasSelection && !summary && <p>Loading description…</p>}
+
+          {hasSelection && summary && <p>{summary}</p>}
+        </div>
+
+        {hasSelection && (
+          <div className="pt-2">
+            {pageUrl && (
+              <a
+                href={pageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary-blue hover:underline"
+              >
+                View full article on Wikipedia
+              </a>
             )}
-          </p>
-        )}
-      </header>
-
-      <div className="mt-4 space-y-3 text-sm text-body">
-        {!park && <p>Select a park from the list or map to see more details.</p>}
-
-        {park && !summary && (
-          <p>
-            Loading description… (fetched from Wikipedia&apos;s summary API when a park is
-            selected).
-          </p>
-        )}
-
-        {park && summary && <p>{summary}</p>}
-
-        {park && imageUrl && (
-          <div className="mt-3">
-            {/* If you're using next/image: */}
-            {/* <Image src={imageUrl} alt={park.name} width={600} height={400} className="rounded-lg" /> */}
-            {/* For now, plain img is ok: */}
-            <img
-              src={imageUrl}
-              alt={park.name}
-              className="w-full max-h-72 rounded-lg object-cover"
-            />
+            <p className="mt-1 text-[11px] text-muted">
+              Text and images (when available) are sourced from Wikipedia and are subject to the
+              CC&nbsp;BY-SA&nbsp;4.0 license.
+            </p>
           </div>
         )}
-
-        {park && (
-          <p className="text-xs text-muted mt-2">
-            {pageUrl && (
-              <>
-                Source:{' '}
-                <a
-                  href={pageUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-blue hover:underline"
-                >
-                  Wikipedia
-                </a>
-                .{' '}
-              </>
-            )}
-            Text and images are provided by Wikipedia&apos;s summary API and are subject to the CC
-            BY-SA 4.0 License.
-          </p>
-        )}
       </div>
+
+      {/* Right side: smaller image */}
+      {hasSelection && imageUrl && (
+        <div className="w-full max-w-[220px] lg:w-[220px] flex-shrink-0 self-stretch">
+          <div className="h-full rounded-lg bg-background/40 overflow-hidden">
+            {/* You can switch this to next/image if you want */}
+            <img
+              src={imageUrl}
+              alt={park?.name ?? 'Park image'}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
