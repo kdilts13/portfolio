@@ -7,20 +7,64 @@ import ParkMap from '@/app/components/parks/ParkMap';
 import ParkDetailsPanel from '@/app/components/parks/ParkDetailsPanel';
 import { PARKS } from '@/app/data/parksData';
 
+import { auth, db } from '@/lib/firebase';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+
 export default function ParksPage() {
   const [parks, setParks] = useState<Park[]>([]);
   const [selectedParkId, setSelectedParkId] = useState<string | null>(null);
   const [visitedParkIds, setVisitedParkIds] = useState<string[]>([]);
   const [wikiData, setWikiData] = useState<ParkWikiData | null>(null);
 
-  useEffect(() => {
-    async function loadParks() {
-      setParks(PARKS);
-    }
+  const [user, setUser] = useState<User | null>(null);
+  const [visitedLoaded, setVisitedLoaded] = useState(false);
 
-    loadParks();
+  // Load static parks data
+  useEffect(() => {
+    setParks(PARKS);
   }, []);
 
+  // Watch auth state
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+    return unsub;
+  }, []);
+
+  // Load visited parks for the current user
+  useEffect(() => {
+    if (!user) {
+      setVisitedParkIds([]);
+      setVisitedLoaded(false);
+      return;
+    }
+
+    async function loadVisited() {
+      try {
+        if (user && user.uid) {
+          const ref = doc(db, 'userParks', user.uid);
+          const snap = await getDoc(ref);
+
+          if (snap.exists()) {
+            const data = snap.data() as { visitedParkIds?: string[] };
+            setVisitedParkIds(Array.isArray(data.visitedParkIds) ? data.visitedParkIds : []);
+          } else {
+            setVisitedParkIds([]);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading visited parks:', err);
+      } finally {
+        setVisitedLoaded(true);
+      }
+    }
+
+    loadVisited();
+  }, [user]);
+
+  // Load Wikipedia data for selected park
   useEffect(() => {
     if (!selectedParkId) {
       setWikiData(null);
@@ -45,7 +89,6 @@ export default function ParksPage() {
 
         if (!cancelled) {
           setWikiData(data ?? null);
-          // Later, if you want image + url in state, you can extend state here
         }
       } catch (err) {
         console.error('Failed to load Wikipedia summary:', err);
@@ -64,15 +107,43 @@ export default function ParksPage() {
     setSelectedParkId(parkId);
   };
 
+  // Helper to persist visited park IDs for the logged-in user
+  async function persistVisited(userId: string, ids: string[]) {
+    try {
+      const ref = doc(db, 'userParks', userId);
+      await setDoc(
+        ref,
+        {
+          visitedParkIds: ids,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+    } catch (err) {
+      console.error('Error saving visited parks:', err);
+    }
+  }
+
   const handleToggleVisited = (parkId: string, visited: boolean) => {
     setVisitedParkIds((prev) => {
       const exists = prev.includes(parkId);
-      if (visited && !exists) return [...prev, parkId];
-      if (!visited && exists) return prev.filter((id) => id !== parkId);
-      return prev;
+      let next = prev;
+
+      if (visited && !exists) {
+        next = [...prev, parkId];
+      } else if (!visited && exists) {
+        next = prev.filter((id) => id !== parkId);
+      }
+
+      // Persist for logged-in users (optimistic update)
+      if (user) {
+        void persistVisited(user.uid, next);
+      }
+
+      return next;
     });
 
-    // TODO: persist visited state via API / Firestore
+    // If not logged in, this just stays in local state for the session.
   };
 
   const selectedPark = parks.find((p) => p.id === selectedParkId) ?? null;

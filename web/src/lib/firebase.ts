@@ -5,6 +5,7 @@ import {
   browserLocalPersistence,
   connectAuthEmulator,
 } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -16,13 +17,20 @@ const firebaseConfig = {
 
 export const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 // Point Auth SDK at emulator in dev
 if (process.env.NODE_ENV !== 'production') {
   // Avoid double-connect on HMR
-  // @ts-ignore
+  // @ts-expect-error internal field
   if (!auth._isEmulator)
     connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+
+  // Only connect Firestore emulator if not already configured
+  // @ts-expect-error internal field
+  if (!(db._settings && db._settings.host && db._settings.host.includes('localhost'))) {
+    connectFirestoreEmulator(db, '127.0.0.1', 8081);
+  }
 }
 
 setPersistence(auth, browserLocalPersistence).catch(() => {});
