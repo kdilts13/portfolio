@@ -153,16 +153,14 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Set up Firebase auth
-        run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}' > /tmp/firebase-key.json
-          export GOOGLE_APPLICATION_CREDENTIALS="/tmp/firebase-key.json"
-
       - name: Deploy Firestore rules
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-key.json
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
         run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > "$HOME/firebase-key.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/firebase-key.json"
+          echo "Deploying Firestore rules to project: $FIREBASE_PROJECT_ID"
           firebase deploy \
             --only firestore:rules \
             --project "$FIREBASE_PROJECT_ID" \
