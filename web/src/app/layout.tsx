@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Poppins } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/auth-context';
+import SiteNav from '@/app/components/navigation/siteNav';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,7 +32,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} antialiased bg-background text-foreground`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <SiteNav />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

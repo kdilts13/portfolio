@@ -42,6 +42,28 @@ body {
   color: var(--foreground);
 }
 
+@keyframes nav-desktop-reveal {
+  0% {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.nav-desktop-reveal {
+  animation: nav-desktop-reveal 320ms ease-out 80ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-desktop-reveal {
+    animation: none;
+  }
+}
+
 @layer components {
   /* ===== Card ===== */
   .card {
