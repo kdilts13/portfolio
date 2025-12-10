@@ -34,6 +34,9 @@ jobs:
             web:
               - 'web/**'
               - '.github/workflows/deploy.yaml'
+              - 'firebase.json'
+              - 'firestore.rules'
+              - '.firebaserc'
 
   test_api:
     if: needs.changes.outputs.api == 'true'
