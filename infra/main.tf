@@ -146,3 +146,10 @@ resource "google_project_iam_member" "firebase_rules_admin" {
   role    = "roles/firebaserules.admin"
   member  = "serviceAccount:${google_service_account.firebase_rules_deployer.email}"
 }
+
+# IAM role so it can call the Service Usage API (needed by firebase CLI)
+resource "google_project_iam_member" "firebase_rules_serviceusage_viewer" {
+  project = var.project_id
+  role    = "roles/serviceusage.serviceUsageViewer"
+  member  = "serviceAccount:${google_service_account.firebase_rules_deployer.email}"
+}
