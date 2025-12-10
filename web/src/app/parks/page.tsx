@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Park, ParkWikiData } from '@/app/components/parks/types';
 import ParkList from '@/app/components/parks/ParkList';
@@ -18,6 +19,9 @@ export default function ParksPage() {
   const [wikiData, setWikiData] = useState<ParkWikiData | null>(null);
 
   const [user, setUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [showGuestNotice, setShowGuestNotice] = useState(false);
+  const [guestNoticeDismissed, setGuestNoticeDismissed] = useState(false);
   const [visitedLoaded, setVisitedLoaded] = useState(false);
 
   // Load static parks data
@@ -29,9 +33,35 @@ export default function ParksPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
+      setAuthChecked(true);
     });
     return unsub;
   }, []);
+
+  // Show guest notice when user is not logged in
+  useEffect(() => {
+    if (!authChecked) return;
+
+    if (user) {
+      setShowGuestNotice(false);
+      setGuestNoticeDismissed(false);
+      return;
+    }
+
+    setShowGuestNotice(!guestNoticeDismissed);
+  }, [authChecked, user, guestNoticeDismissed]);
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const previousOverflow = document.body.style.overflow;
+
+    if (showGuestNotice) document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showGuestNotice]);
 
   // Load visited parks for the current user
   useEffect(() => {
@@ -150,6 +180,55 @@ export default function ParksPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
+      {showGuestNotice && (
+        <div className="fixed inset-0 z-[60] flex items-start justify-center bg-black/60 px-4 py-8 backdrop-blur-sm">
+          <div className="relative w-full max-w-md rounded-2xl border border-primary-blue/40 bg-card p-6 shadow-2xl">
+            <button
+              type="button"
+              aria-label="Dismiss notice"
+              onClick={() => {
+                setGuestNoticeDismissed(true);
+                setShowGuestNotice(false);
+              }}
+              className="absolute right-3 top-3 rounded-full p-2 text-sm text-muted transition-colors hover:bg-background/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue"
+            >
+              X
+            </button>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">
+              Heads up
+            </p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">You are browsing as a guest</h2>
+            <p className="mt-2 text-sm text-muted">
+              Your visited parks won&apos;t be saved between visits unless you log in. Sign in to keep
+              your checklist in sync across devices.
+            </p>
+
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <Link
+                href="/login"
+                className="btn-primary flex-1 text-center"
+                onClick={() => {
+                  setGuestNoticeDismissed(true);
+                  setShowGuestNotice(false);
+                }}
+              >
+                Go to login
+              </Link>
+              <button
+                type="button"
+                className="btn-muted px-4"
+                onClick={() => {
+                  setGuestNoticeDismissed(true);
+                  setShowGuestNotice(false);
+                }}
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div
         className="
         mx-auto max-w-6xl px-4 py-4
