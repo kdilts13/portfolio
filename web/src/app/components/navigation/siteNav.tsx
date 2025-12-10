@@ -11,9 +11,12 @@ type NavLink = {
 
 const NAV_LINKS: NavLink[] = [
   { label: 'Home', href: '/' },
-  { label: 'Login', href: '/login' },
   { label: 'National Parks', href: '/parks' },
+  { label: 'Login', href: '/login' },
 ];
+
+const NAV_SURFACE = 'bg-card';
+const NAV_BORDER = 'border-primary-blue/35';
 
 function isActivePath(pathname: string, href: string) {
   if (href === '/') return pathname === '/';
@@ -82,7 +85,9 @@ export default function SiteNav() {
   return (
     <>
       {/* Mobile / tablet top bar with hamburger and slide-out */}
-      <header className="sticky top-0 z-40 border-b border-card/60 bg-background/90 backdrop-blur lg:hidden">
+      <header
+        className={`sticky top-0 z-50 border-b ${NAV_BORDER} ${NAV_SURFACE} lg:hidden`}
+      >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <Link
             href="/"
@@ -112,7 +117,7 @@ export default function SiteNav() {
 
         <div className={`${mobileOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
           <div
-            className={`fixed inset-0 bg-black/50 transition-opacity duration-300 ${
+            className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
               mobileOpen ? 'opacity-100' : 'opacity-0'
             }`}
             aria-hidden="true"
@@ -122,7 +127,7 @@ export default function SiteNav() {
           <nav
             id="mobile-nav"
             aria-label="Mobile"
-            className={`fixed right-0 top-0 flex h-full w-72 flex-col gap-6 border-l border-card/60 bg-background/95 px-6 py-6 shadow-xl backdrop-blur transition-transform duration-300 ${
+            className={`fixed right-0 top-0 z-50 flex h-full w-72 flex-col gap-6 border ${NAV_BORDER} ${NAV_SURFACE} px-6 py-6 shadow-xl transition-transform duration-300 ${
               mobileOpen ? 'translate-x-0' : 'translate-x-full'
             }`}
           >
@@ -174,13 +179,13 @@ export default function SiteNav() {
         <div className="fixed left-0 top-24 z-40">
           <div
             className={`relative w-72 transition-transform duration-300 ease-out ${
-              desktopOpen ? 'translate-x-0' : '-translate-x-[calc(100%-56px)]'
+              desktopOpen ? 'translate-x-0' : '-translate-x-[calc(100%)]'
             }`}
           >
             <button
               type="button"
               aria-label={desktopOpen ? 'Hide navigation' : 'Show navigation'}
-              className="absolute -right-12 top-6 flex h-12 w-12 items-center justify-center rounded-r-lg border border-card/70 bg-card/90 text-foreground shadow-md transition-colors hover:border-primary-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue"
+              className={`absolute -right-12 top-6 flex h-12 w-12 items-center justify-center rounded-r-lg border ${NAV_BORDER} ${NAV_SURFACE} text-foreground shadow-md transition-colors hover:border-primary-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue`}
               onClick={() => setDesktopOpen((open) => !open)}
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary-green to-primary-blue text-xs font-semibold uppercase text-background">
@@ -188,7 +193,9 @@ export default function SiteNav() {
               </span>
             </button>
 
-            <div className="rounded-r-xl border border-card/70 bg-background/95 px-5 py-5 shadow-xl backdrop-blur">
+            <div
+              className={`rounded-r-xl border ${NAV_BORDER} ${NAV_SURFACE} px-5 py-5 shadow-xl`}
+            >
               <Link
                 href="/"
                 className="group flex items-center gap-3 rounded-md p-2 text-foreground transition-colors hover:text-primary-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue"
