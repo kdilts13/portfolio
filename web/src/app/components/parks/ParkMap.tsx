@@ -196,8 +196,11 @@ export default function ParkMap({
       </header>
 
       {/* Map container */}
-      <div className="mt-4 flex-1 min-h-0 rounded-lg bg-background/40">
-        <div ref={mapContainerRef} className="h-full w-full rounded-lg" />
+      <div className="mt-4 flex-1 rounded-lg bg-background/40 lg:min-h-0">
+        <div
+          ref={mapContainerRef}
+          className="h-[320px] w-full rounded-lg lg:h-full"
+        />
       </div>
     </section>
   );
