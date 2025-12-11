@@ -32,25 +32,25 @@ export default function TechStack() {
             'RESTful APIs',
             'Auth systems (JWT, session-based, Firebase Auth)',
             'PostgreSQL',
+            'Elasticsearch (search, filtering, and aggregations)',
+            'Database migrations with Flyway',
             'ORMs (Ecto, Spring Data JPA)',
             'Schema and query design',
-            'Elasticsearch (search, filtering, and aggregations)',
             'WordPress as a headless CMS (content retrieval and API integration)',
-            'Database migrations with Flyway',
           ]}
         />
         <StackGroup
           title="Cloud & DevOps"
           items={[
             'GCP (Cloud Run, Artifact Registry, Firestore)',
-            'CI/CD with GitHub Actions',
+            'CI/CD with GitHub Actions, Jenkins, and CircleCI',
             'Docker',
             'Terraform',
+            'Service accounts and IAM permissions',
             'AWS (S3, preview environments on Kubernetes)',
             'Azure (project collaboration)',
-            'Service accounts and IAM permissions',
-            'Splunk',
-            'Datadog',
+            'Splunk (log analysis)',
+            'Datadog (monitoring and observability)',
           ]}
         />
       </div>
