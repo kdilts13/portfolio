@@ -53,9 +53,11 @@ export default function LoginPage() {
         <header className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Auth</p>
           <h1 className="text-2xl font-semibold text-foreground">
-            {mode === 'signin' ? 'Sign in' : 'Create account'}
+            {user ? 'Sign out' : mode === 'signin' ? 'Sign in' : 'Create account'}
           </h1>
-          <p className="text-sm text-muted">Use your email and password, or sign in with Google.</p>
+          {!user && (
+            <p className="text-sm text-muted">Use your email and password, or sign in with Google.</p>
+          )}
         </header>
 
         {!user ? (
