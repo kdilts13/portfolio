@@ -10,12 +10,12 @@ export default function Timeline() {
         <div className="space-y-4 text-sm text-body">
           <p>
             I&apos;ve spent the last several years building and maintaining full-stack systems:
-            front-end work in React and Angular, back-end services in Java and Elixir, and
-            deployments on modern cloud platforms.
+            front-end work in Phoenix LiveView, React, and Angular; back-end services in Elixir; and
+            deployments on modern cloud platforms like GCP.
           </p>
           <p>
-            This portfolio pulls those experiences into one place: real projects, production-style
-            infrastructure, and some playful tools that show how I approach problem solving and UX.
+            This portfolio uses those skills in self-directed projects with production-style
+            infrastructure and a few playful tools that show how I approach problem-solving and UX.
           </p>
           <p>
             I&apos;m currently looking for backend or full-stack roles where I can contribute to
