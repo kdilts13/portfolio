@@ -7,25 +7,50 @@ export default function TechStack() {
       <SectionHeader
         eyebrow="Tooling"
         title="Tech I'm comfortable shipping with"
-        subtitle="The main technologies I've used to build production systems and portfolio projects."
+        subtitle="The main technologies I've used in production and portfolio projects."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StackGroup
           title="Front-end"
-          items={['TypeScript', 'React', 'Next.js', 'Tailwind CSS', 'Jest / React Testing Library']}
+          items={[
+            'React',
+            'Next.js',
+            'Angular',
+            'TypeScript',
+            'Tailwind CSS',
+            'CSS (Sass/SCSS)',
+            'Jest and React Testing Library',
+          ]}
         />
         <StackGroup
           title="Back-end"
-          items={['Java / Spring Boot', 'Elixir / Phoenix', 'Node.js', 'REST APIs', 'PostgreSQL']}
+          items={[
+            'Java / Spring Boot',
+            'Elixir / Phoenix',
+            'Node.js',
+            'RESTful APIs',
+            'Auth systems (JWT, session-based, Firebase Auth)',
+            'PostgreSQL',
+            'ORMs (Ecto, Spring Data JPA)',
+            'Schema and query design',
+            'Elasticsearch (search, filtering, and aggregations)',
+            'WordPress as a headless CMS (content retrieval and API integration)',
+            'Database migrations with Flyway',
+          ]}
         />
         <StackGroup
           title="Cloud & DevOps"
           items={[
-            'GCP (Cloud Run, Artifact Registry)',
+            'GCP (Cloud Run, Artifact Registry, Firestore)',
             'CI/CD with GitHub Actions',
             'Docker',
-            'Terraform (in progress)',
+            'Terraform',
+            'AWS (S3, preview environments on Kubernetes)',
+            'Azure (project collaboration)',
+            'Service accounts and IAM permissions',
+            'Splunk',
+            'Datadog',
           ]}
         />
       </div>
