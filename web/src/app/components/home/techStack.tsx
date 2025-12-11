@@ -32,11 +32,11 @@ export default function TechStack() {
             'RESTful APIs',
             'Auth systems (JWT, session-based, Firebase Auth)',
             'PostgreSQL',
-            'Elasticsearch (search, filtering, and aggregations)',
-            'Database migrations with Flyway',
             'ORMs (Ecto, Spring Data JPA)',
             'Schema and query design',
+            'Elasticsearch (search, filtering, and aggregations)',
             'WordPress as a headless CMS (content retrieval and API integration)',
+            'Database migrations with Flyway',
           ]}
         />
         <StackGroup
