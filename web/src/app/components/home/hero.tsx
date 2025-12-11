@@ -15,7 +15,7 @@ export default function Hero() {
 
         <p className="max-w-xl text-sm text-body sm:text-base">
           Full-stack engineer who enjoys building clean UIs, reliable APIs, and practical tools. I
-          like working with Next.js, TypeScript, and Java on cloud-native systems.
+          like working with TypeScript, Elixir, Java, Postgres, and GCP.
         </p>
 
         <div className="flex flex-wrap gap-3 pt-2">
@@ -33,14 +33,14 @@ export default function Hero() {
       <div className="grid w-full gap-4 sm:grid-cols-2 lg:max-w-md">
         <HighlightCard
           label="Current focus"
-          title="Portfolio & platform"
-          body="Building a cohesive portfolio with real features: national parks tracker, Helldivers tools, and more."
+          title="Portfolio"
+          body="Building a cohesive portfolio with real features. Starting with a national parks tracker, and more on the way."
         />
 
         <HighlightCard
           label="Strengths"
           title="Full-stack delivery"
-          body="From React/Next.js front-ends to Spring Boot APIs and infrastructure on GCP."
+          body="My work spans the entire stack, from creating intuitive interfaces to designing fast backend services and managing the infrastructure that supports them."
         />
 
         <HighlightCard
