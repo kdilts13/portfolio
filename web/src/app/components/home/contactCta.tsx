@@ -12,7 +12,7 @@ export default function ContactCta() {
 
         <div className="flex flex-wrap gap-3">
           <a href="mailto:kdilts13@gmail.com" className="btn-primary">
-            Email me
+            Email me: kdilts13@gmail.com
           </a>
 
           <a
