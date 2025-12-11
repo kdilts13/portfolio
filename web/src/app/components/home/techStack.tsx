@@ -7,7 +7,7 @@ export default function TechStack() {
       <SectionHeader
         eyebrow="Tooling"
         title="Tech I'm comfortable shipping with"
-        subtitle="The main technologies I've used in production and portfolio projects."
+        subtitle="The main technologies I've used in production systems and portfolio projects."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
