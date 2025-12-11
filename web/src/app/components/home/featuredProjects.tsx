@@ -7,7 +7,7 @@ export default function FeaturedProjects() {
       <SectionHeader
         eyebrow="Featured work"
         title="Projects that represent how I build"
-        subtitle="A mix of real-world systems and portfolio pieces that show my approach to designing, implementing, and shipping features."
+        subtitle="Portfolio projects that reflect how I approach UX, APIs, and infrastructure."
       />
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -15,13 +15,13 @@ export default function FeaturedProjects() {
           title="Portfolio Platform"
           role="Full-stack • In-progress"
           tech="Next.js · TypeScript · Tailwind · Spring Boot · GCP Cloud Run"
-          description="A unified portfolio site with an authenticated dashboard, real API integration, and production-grade CI/CD."
+          description="A cohesive platform that brings my projects together and shows how I structure UI, API, and deployment layers into a single, maintainable system."
         />
         <ProjectCard
           title="National Parks Explorer"
           role="Front-end / Maps"
           tech="Next.js · Maps API · Firestore"
-          description="A map-based tool to track visited parks, plan trips, and store notes, designed to highlight UX and data modeling."
+          description="A map-based tool to browse national parks and track which ones you've visited. Built to highlight UX, data modeling, and integration with real APIs."
         />
       </div>
     </section>
