@@ -19,7 +19,7 @@ export default function Hero() {
         </p>
 
         <div className="flex flex-wrap gap-3 pt-2">
-          <a href="#projects" className="btn-primary">
+          <a href="#projects" className="btn-primary lg:hidden">
             View my work
           </a>
 
