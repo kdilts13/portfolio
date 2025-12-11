@@ -29,7 +29,7 @@ export default function Timeline() {
           <ul className="space-y-2">
             <li>• Building this portfolio as a production-style system on GCP.</li>
             <li>• Deepening experience with Java / Spring Boot and CI/CD pipelines.</li>
-            <li>• Exploring maps, game-adjacent tools, and creative UI patterns.</li>
+            <li>• Exploring maps, AI tools, and creative UI patterns.</li>
           </ul>
         </div>
       </div>
