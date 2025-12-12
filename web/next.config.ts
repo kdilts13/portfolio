@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
     return [
       // Proxy all frontend requests for /api/* to Spring Boot on :8080
       { source: '/api/:path*', destination: `${API_TARGET}/api/:path*` },
-
-      // (optional) expose actuator while developing
-      { source: '/actuator/:path*', destination: `${API_TARGET}/actuator/:path*` },
     ];
   },
 };

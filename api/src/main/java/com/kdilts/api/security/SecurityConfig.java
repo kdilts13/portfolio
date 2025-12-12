@@ -34,6 +34,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/me").authenticated()
                 .requestMatchers("/api/**").authenticated()
 
+                // Reject actuator requests
+                .requestMatchers("/actuator/**").denyAll()
+
                 // Everything else (non-API) is public
                 .anyRequest().permitAll()
             )
