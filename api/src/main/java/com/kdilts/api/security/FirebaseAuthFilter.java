@@ -77,7 +77,7 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
                     "updatedAt", Timestamp.now()
                 );
                 userRef.set(data).get();
-                log.info("Created pending user record for uid={} email={}", uid, email);
+                log.info("Created pending user record for uid={}", uid);
             } else {
                 Object value = snap.get("approved");
                 if (value instanceof Boolean b) {
@@ -105,7 +105,7 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
             request.setAttribute("firebaseEmail", email);
 
             if (!approved) {
-                log.warn("User uid={} email={} is not approved", uid, email);
+                log.warn("User uid={} is not approved", uid);
             }
 
             filterChain.doFilter(request, response);
