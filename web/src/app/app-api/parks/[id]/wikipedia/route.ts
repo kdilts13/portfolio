@@ -30,7 +30,7 @@ export async function GET(request: Request, context: RouteContext) {
     const res = await fetch(apiUrl, {
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'kd-portfolio/1.0 (https://example.com)',
+        'User-Agent': 'kdilts.net/1.0 (mailto:kdilts13@gmail.com)',
       },
       next: { revalidate: 60 * 60 * 24 },
     });
