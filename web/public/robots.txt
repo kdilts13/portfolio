@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /_next/
+Disallow: /app-api/
+
+Sitemap: https://kdilts.net/sitemap.xml
