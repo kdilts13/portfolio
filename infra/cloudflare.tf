@@ -37,7 +37,7 @@ resource "cloudflare_record" "apex_a" {
   for_each = toset(local.apex_a_records)
 
   zone_id = var.cloudflare_zone_id
-  name    = "@"
+  name = "kdilts.net"
   type    = "A"
   value   = each.value
   proxied = true
@@ -49,7 +49,7 @@ resource "cloudflare_record" "apex_aaaa" {
   for_each = toset(local.apex_aaaa_records)
 
   zone_id = var.cloudflare_zone_id
-  name    = "@"
+  name = "kdilts.net"
   type    = "AAAA"
   value   = each.value
   proxied = true
@@ -69,7 +69,7 @@ resource "cloudflare_record" "www" {
 # google-site-verification TXT (DNS only, TTL 1 hour)
 resource "cloudflare_record" "google_site_verification" {
   zone_id = var.cloudflare_zone_id
-  name    = "@"
+  name = "kdilts.net"
   type    = "TXT"
   value   = var.google_site_verification
 
