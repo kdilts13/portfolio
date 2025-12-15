@@ -157,19 +157,12 @@ resource "google_project_iam_member" "firebase_rules_serviceusage_viewer" {
   member  = "serviceAccount:${google_service_account.firebase_rules_deployer.email}"
 }
 
-# TEMP: should trigger tfsec failure
-resource "google_cloud_run_v2_service_iam_member" "api_invoker_all_temp" {
-  project  = var.project_id
-  location = var.region
-  name     = google_cloud_run_v2_service.api.name
-
-  role   = "roles/run.invoker"
-  member = "allUsers"
+# TEMP: tfsec should flag this as public S3 access
+resource "aws_s3_bucket" "tfsec_fail" {
+  bucket = "tfsec-fail-test-kdilts"
 }
 
-# TEMP: should trigger tfsec (overly-permissive IAM)
-resource "google_project_iam_member" "tfsec_fail_owner_temp" {
-  project = var.project_id
-  role    = "roles/owner"
-  member  = "serviceAccount:${google_service_account.run_web.email}"
+resource "aws_s3_bucket_acl" "tfsec_fail_acl" {
+  bucket = aws_s3_bucket.tfsec_fail.id
+  acl    = "public-read"
 }
