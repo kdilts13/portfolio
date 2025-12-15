@@ -166,3 +166,10 @@ resource "google_cloud_run_v2_service_iam_member" "api_invoker_all_temp" {
   role   = "roles/run.invoker"
   member = "allUsers"
 }
+
+# TEMP: should trigger tfsec (overly-permissive IAM)
+resource "google_project_iam_member" "tfsec_fail_owner_temp" {
+  project = var.project_id
+  role    = "roles/owner"
+  member  = "serviceAccount:${google_service_account.run_web.email}"
+}
