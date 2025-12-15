@@ -47,9 +47,14 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        // Prefer the forwarded Firebase token header (used when Cloud Run auth occupies Authorization)
+        String authHeader = request.getHeader("X-Firebase-Authorization");
+        if (authHeader == null || authHeader.isBlank()) {
+            authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        }
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Missing or invalid Authorization header on {}", path);
+            log.warn("Missing or invalid Firebase auth token header on {}", path);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

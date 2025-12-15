@@ -38,9 +38,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // We have a Firebase user -> fetch /api/me once
+      // We have a Firebase user -> fetch /app-api/me once
       try {
-        const res = await apiFetch('/api/me', user);
+        const res = await apiFetch('/app-api/me', user);
         if (!res.ok) {
           // If backend says 401/403/etc, just clear me
           setState({ user, me: null, loading: false });
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const me = (await res.json()) as MeResponse;
         setState({ user, me, loading: false });
       } catch (err) {
-        console.error('Failed to fetch /api/me', err);
+        console.error('Failed to fetch /app-api/me', err);
         setState({ user, me: null, loading: false });
       }
     });

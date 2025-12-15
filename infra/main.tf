@@ -103,7 +103,7 @@ resource "google_cloud_run_v2_service" "web" {
       }
 
       env {
-        name  = "NEXT_PUBLIC_API_BASE"
+        name  = "API_BASE"
         value = "https://api-y3wnybmuqa-uc.a.run.app"
       }
     }
@@ -122,12 +122,13 @@ resource "google_cloud_run_v2_service_iam_member" "web_invoker_all" {
   member   = "allUsers"
 }
 
-resource "google_cloud_run_v2_service_iam_member" "api_invoker_all" {
+# Allow ONLY the web Cloud Run service account to call the API service
+resource "google_cloud_run_v2_service_iam_member" "api_invoker_web" {
   project  = var.project_id
   location = var.region
   name     = google_cloud_run_v2_service.api.name
   role     = "roles/run.invoker"
-  member   = "allUsers"
+  member   = "serviceAccount:${google_service_account.run_web.email}"
 }
 
 # Service account for deploying Firebase/Firestore rules from CI
