@@ -123,12 +123,14 @@ resource "google_cloud_run_v2_service_iam_member" "web_invoker_all" {
 }
 
 # Allow ONLY the web Cloud Run service account to call the API service
-resource "google_cloud_run_v2_service_iam_member" "api_invoker_web" {
+resource "google_cloud_run_v2_service_iam_binding" "api_invokers" {
   project  = var.project_id
   location = var.region
   name     = google_cloud_run_v2_service.api.name
-  role     = "roles/run.invoker"
-  member   = "serviceAccount:${google_service_account.run_web.email}"
+  role    = "roles/run.invoker"
+  members = [
+    "serviceAccount:${google_service_account.run_web.email}",
+  ]
 }
 
 # Service account for deploying Firebase/Firestore rules from CI

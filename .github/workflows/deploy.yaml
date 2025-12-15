@@ -118,8 +118,7 @@ jobs:
           gcloud run deploy api \
             --image="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$API_IMAGE:latest" \
             --region="$GCP_REGION" \
-            --service-account="run-api@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
-            --allow-unauthenticated
+            --service-account="run-api@$GCP_PROJECT_ID.iam.gserviceaccount.com"
 
   test_web:
     if: needs.changes.outputs.web == 'true'
