@@ -156,13 +156,3 @@ resource "google_project_iam_member" "firebase_rules_serviceusage_viewer" {
   role    = "roles/serviceusage.serviceUsageViewer"
   member  = "serviceAccount:${google_service_account.firebase_rules_deployer.email}"
 }
-
-# TEMP: tfsec should flag this as public S3 access
-resource "aws_s3_bucket" "tfsec_fail" {
-  bucket = "tfsec-fail-test-kdilts"
-}
-
-resource "aws_s3_bucket_acl" "tfsec_fail_acl" {
-  bucket = aws_s3_bucket.tfsec_fail.id
-  acl    = "public-read"
-}
