@@ -39,7 +39,7 @@ resource "cloudflare_record" "apex_a" {
   zone_id = var.cloudflare_zone_id
   name = "kdilts.net"
   type    = "A"
-  value   = each.value
+  content   = each.value
   proxied = true
   ttl     = 1 # "Auto" in Cloudflare
 }
@@ -51,7 +51,7 @@ resource "cloudflare_record" "apex_aaaa" {
   zone_id = var.cloudflare_zone_id
   name = "kdilts.net"
   type    = "AAAA"
-  value   = each.value
+  content   = each.value
   proxied = true
   ttl     = 1 # "Auto" in Cloudflare
 }
@@ -61,7 +61,7 @@ resource "cloudflare_record" "www" {
   zone_id = var.cloudflare_zone_id
   name    = "www"
   type    = "CNAME"
-  value   = "ghs.googlehosted.com"
+  content   = "ghs.googlehosted.com"
   proxied = true
   ttl     = 1 # "Auto"
 }
@@ -71,7 +71,7 @@ resource "cloudflare_record" "google_site_verification" {
   zone_id = var.cloudflare_zone_id
   name = "kdilts.net"
   type    = "TXT"
-  value   = var.google_site_verification
+  content   = var.google_site_verification
 
   proxied = false
   ttl     = 3600
