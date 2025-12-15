@@ -22,6 +22,7 @@ jobs:
     outputs:
       api: ${{ steps.filter.outputs.api }}
       web: ${{ steps.filter.outputs.web }}
+      infra: ${{ steps.filter.outputs.infra }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -37,6 +38,21 @@ jobs:
               - 'firebase.json'
               - 'firestore.rules'
               - '.firebaserc'
+            infra:
+              - 'infra/**'
+              - '.github/workflows/deploy.yaml'
+
+  tfsec:
+    if: needs.changes.outputs.infra == 'true'
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tfsec (Terraform security scan)
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: infra
 
   test_api:
     if: needs.changes.outputs.api == 'true'
@@ -62,7 +78,7 @@ jobs:
 
   build_deploy_api:
     if: needs.changes.outputs.api == 'true'
-    needs: [changes, test_api]
+    needs: [changes, test_api, tfsec]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -144,7 +160,7 @@ jobs:
 
   build_deploy_web:
     if: needs.changes.outputs.web == 'true'
-    needs: [changes, test_web]
+    needs: [changes, test_web, tfsec]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
