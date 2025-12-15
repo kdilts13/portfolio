@@ -156,3 +156,13 @@ resource "google_project_iam_member" "firebase_rules_serviceusage_viewer" {
   role    = "roles/serviceusage.serviceUsageViewer"
   member  = "serviceAccount:${google_service_account.firebase_rules_deployer.email}"
 }
+
+# TEMP: should trigger tfsec failure
+resource "google_cloud_run_v2_service_iam_member" "api_invoker_all_temp" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.api.name
+
+  role   = "roles/run.invoker"
+  member = "allUsers"
+}
