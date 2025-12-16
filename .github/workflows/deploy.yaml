@@ -271,8 +271,8 @@ jobs:
       - name: Auth to GCP via WIF
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_TERRAFORM_SA }}
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_SA }}
 
       - uses: google-github-actions/setup-gcloud@v2
 
@@ -305,7 +305,7 @@ jobs:
   terraform_apply:
     name: Terraform apply
     needs: terraform_plan
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.infra == 'true'
     runs-on: ubuntu-latest
 
     environment: production # <-- approval gate
@@ -326,8 +326,8 @@ jobs:
       - name: Auth to GCP via WIF
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_TERRAFORM_SA }}
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_SA }}
 
       - uses: google-github-actions/setup-gcloud@v2
 
