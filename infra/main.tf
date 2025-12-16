@@ -59,6 +59,13 @@ resource "google_cloud_run_v2_service" "api" {
   name     = "api"
   location = var.region
 
+  lifecycle {
+    ignore_changes = [
+      client,
+      client_version,
+    ]
+  }
+
   template {
     service_account = google_service_account.run_api.email
 
@@ -84,6 +91,13 @@ resource "google_cloud_run_v2_service" "api" {
 resource "google_cloud_run_v2_service" "web" {
   name     = "web"
   location = var.region
+
+  lifecycle {
+    ignore_changes = [
+      client,
+      client_version,
+    ]
+  }
 
   template {
     service_account = google_service_account.run_web.email
