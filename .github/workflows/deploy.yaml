@@ -260,6 +260,10 @@ jobs:
     if: needs.changes.outputs.infra == 'true'
     runs-on: ubuntu-latest
 
+    concurrency:
+      group: terraform-global
+      cancel-in-progress: false
+
     permissions:
       contents: read
       id-token: write # required for GCP WIF
@@ -288,7 +292,10 @@ jobs:
           TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
           TF_VAR_cloudflare_api_token: ${{ secrets.TF_VAR_CLOUDFLARE_API_TOKEN }}
           TF_VAR_cloudflare_zone_id: ${{ secrets.TF_VAR_CLOUDFLARE_ZONE_ID }}
-        run: terraform init
+        run: terraform init -input=false
+
+      - name: Terraform format
+        run: terraform fmt -check -recursive
 
       - name: Terraform validate
         working-directory: infra
@@ -300,7 +307,7 @@ jobs:
           TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
           TF_VAR_cloudflare_api_token: ${{ secrets.TF_VAR_CLOUDFLARE_API_TOKEN }}
           TF_VAR_cloudflare_zone_id: ${{ secrets.TF_VAR_CLOUDFLARE_ZONE_ID }}
-        run: terraform plan -out=tfplan
+        run: terraform plan -lock-timeout=5m -input=false -out=tfplan
 
       - name: Upload plan
         uses: actions/upload-artifact@v4
@@ -313,6 +320,10 @@ jobs:
     needs: terraform_plan
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.infra == 'true'
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: terraform-global
+      cancel-in-progress: false
 
     environment: production # <-- approval gate
 
@@ -357,4 +368,4 @@ jobs:
           TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
           TF_VAR_cloudflare_api_token: ${{ secrets.TF_VAR_CLOUDFLARE_API_TOKEN }}
           TF_VAR_cloudflare_zone_id: ${{ secrets.TF_VAR_CLOUDFLARE_ZONE_ID }}
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -lock-timeout=5m -input=false -auto-approve tfplan
