@@ -9,7 +9,8 @@ variable "cloudflare_zone_id" {
 
 variable "google_site_verification" {
   type        = string
-  description = "google-site-verification=ONE-3vpM3HdPRt3SZPQn40-DVuHxzlSQar9-O_8mCGM"
+  description = "Value of the google-site-verification TXT record"
+  default = "google-site-verification=ONE-3vpM3HdPRt3SZPQn40-DVuHxzlSQar9-O_8mCGM"
 }
 
 provider "cloudflare" {

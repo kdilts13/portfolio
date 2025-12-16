@@ -156,3 +156,9 @@ resource "google_project_iam_member" "firebase_rules_serviceusage_viewer" {
   role    = "roles/serviceusage.serviceUsageViewer"
   member  = "serviceAccount:${google_service_account.firebase_rules_deployer.email}"
 }
+
+resource "google_storage_bucket_iam_member" "tfstate_object_admin" {
+  bucket = "kd-portfolio-prod-tfstate"
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:gh-deployer@${var.project_id}.iam.gserviceaccount.com"
+}
