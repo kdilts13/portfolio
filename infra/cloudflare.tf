@@ -10,7 +10,7 @@ variable "cloudflare_zone_id" {
 variable "google_site_verification" {
   type        = string
   description = "Value of the google-site-verification TXT record"
-  default = "google-site-verification=ONE-3vpM3HdPRt3SZPQn40-DVuHxzlSQar9-O_8mCGM"
+  default     = "google-site-verification=ONE-3vpM3HdPRt3SZPQn40-DVuHxzlSQar9-O_8mCGM"
 }
 
 provider "cloudflare" {
@@ -38,9 +38,9 @@ resource "cloudflare_record" "apex_a" {
   for_each = toset(local.apex_a_records)
 
   zone_id = var.cloudflare_zone_id
-  name = "kdilts.net"
+  name    = "kdilts.net"
   type    = "A"
-  content   = each.value
+  content = each.value
   proxied = true
   ttl     = 1 # "Auto" in Cloudflare
 }
@@ -50,9 +50,9 @@ resource "cloudflare_record" "apex_aaaa" {
   for_each = toset(local.apex_aaaa_records)
 
   zone_id = var.cloudflare_zone_id
-  name = "kdilts.net"
+  name    = "kdilts.net"
   type    = "AAAA"
-  content   = each.value
+  content = each.value
   proxied = true
   ttl     = 1 # "Auto" in Cloudflare
 }
@@ -62,7 +62,7 @@ resource "cloudflare_record" "www" {
   zone_id = var.cloudflare_zone_id
   name    = "www"
   type    = "CNAME"
-  content   = "ghs.googlehosted.com"
+  content = "ghs.googlehosted.com"
   proxied = true
   ttl     = 1 # "Auto"
 }
@@ -70,9 +70,9 @@ resource "cloudflare_record" "www" {
 # google-site-verification TXT (DNS only, TTL 1 hour)
 resource "cloudflare_record" "google_site_verification" {
   zone_id = var.cloudflare_zone_id
-  name = "kdilts.net"
+  name    = "kdilts.net"
   type    = "TXT"
-  content   = var.google_site_verification
+  content = var.google_site_verification
 
   proxied = false
   ttl     = 3600
