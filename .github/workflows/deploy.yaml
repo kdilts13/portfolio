@@ -43,13 +43,18 @@ jobs:
               - '.github/workflows/deploy.yaml'
 
   tfsec:
-    if: needs.changes.outputs.infra == 'true'
+    name: tfsec
     needs: changes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Skip tfsec (no infra changes)
+        if: needs.changes.outputs.infra != 'true'
+        run: echo "No infra/** changes detected — skipping tfsec."
+
       - name: Run tfsec (Terraform security scan)
+        if: needs.changes.outputs.infra == 'true'
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: infra
@@ -317,7 +322,7 @@ jobs:
 
   terraform_apply:
     name: Terraform apply
-    needs: terraform_plan
+    needs: [changes, terraform_plan]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.infra == 'true'
     runs-on: ubuntu-latest
 
