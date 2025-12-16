@@ -17,6 +17,7 @@ export default function HomePage() {
         <Timeline />
 
         <ContactCta />
+        <p>test</p>
       </div>
     </main>
   );
