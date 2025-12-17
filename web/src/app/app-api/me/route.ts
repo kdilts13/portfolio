@@ -7,6 +7,15 @@ function requireEnv(name: string, val?: string) {
   return val;
 }
 
+function isLocalApiBase(apiBase: string) {
+  return (
+    apiBase.startsWith('http://localhost') ||
+    apiBase.startsWith('http://127.0.0.1') ||
+    apiBase.startsWith('https://localhost') ||
+    apiBase.startsWith('https://127.0.0.1')
+  );
+}
+
 async function fetchCloudRunIdentityToken(audience: string) {
   // Works on Cloud Run (and other GCP compute) via metadata server.
   const url =
@@ -25,8 +34,19 @@ async function fetchCloudRunIdentityToken(audience: string) {
   return res.text();
 }
 
+async function maybeGetIdentityTokenForApi(apiBase: string) {
+  // Local Spring Boot does not need (and cannot fetch) a Cloud Run identity token.
+  if (isLocalApiBase(apiBase)) return null;
+
+  // Only Cloud Run (or other GCP compute) will be able to resolve metadata.google.internal.
+  return fetchCloudRunIdentityToken(apiBase);
+}
+
 export async function GET(req: NextRequest) {
   const apiBase = requireEnv('API_BASE', API_BASE);
+
+  // Cloud Run IAM auth token - audience should match the API origin.
+  const token = await maybeGetIdentityTokenForApi(apiBase);
 
   // Firebase ID token should still come from the browser the same way as today.
   const firebaseAuth = req.headers.get('authorization');
@@ -34,14 +54,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing Firebase token' }, { status: 401 });
   }
 
-  // Cloud Run IAM auth token - audience should match the API origin.
-  const identityToken = await fetchCloudRunIdentityToken(apiBase);
-
   const apiRes = await fetch(`${apiBase}/api/me`, {
     method: 'GET',
     headers: {
       // For Cloud Run invocation auth:
-      Authorization: `Bearer ${identityToken}`,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       // For your Spring Boot Firebase auth filter:
       'X-Firebase-Authorization': firebaseAuth,
     },
