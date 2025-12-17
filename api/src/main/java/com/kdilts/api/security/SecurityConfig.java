@@ -32,6 +32,7 @@ public class SecurityConfig {
 
                 // Fallback for other API calls: must be authenticated at least
                 .requestMatchers("/api/me").authenticated()
+                .requestMatchers("/api/ai/**").authenticated()
                 .requestMatchers("/api/**").authenticated()
 
                 // Reject actuator requests
