@@ -122,6 +122,9 @@ api/build/
 # VS Code (if using a separate folder-level config)
 api/.vscode/
 
+# Local Spring Boot secrets
+api/src/main/resources/application-local.properties
+
 
 ############################################################
 # FIREBASE / FIRESTORE (LOCAL DEV)
