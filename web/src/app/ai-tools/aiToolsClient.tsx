@@ -430,7 +430,7 @@ export default function AiToolsClient() {
             </div>
           </div>
 
-          <div className="rounded-md border border-accent/30 bg-background p-4">
+          <div className="rounded-md border border-accent/30 bg-background p-4 min-h-[240px] max-h-[646px] overflow-y-auto">
             {!output ? (
               <p className="text-sm text-muted">
                 Run a tool (or load the demo) to see output here.
