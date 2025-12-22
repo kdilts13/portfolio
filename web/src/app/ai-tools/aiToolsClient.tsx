@@ -7,6 +7,7 @@ import { apiFetch } from '@/lib/api';
 import { useAuth } from '@/context/auth-context';
 import HighlightCard from '@/app/components/highlightCard';
 import SectionHeader from '@/app/components/sectionHeader';
+import Markdown from '@/app/components/markdown/Markdown';
 
 type Tool = 'resume_tailor' | 'job_fit';
 
@@ -467,12 +468,53 @@ Focus your efforts on JOB 1 and JOB 2 as both offer a strong match to your exper
 export default function AiToolsClient() {
   const { user } = useAuth();
 
+  function toHardBreakMarkdown(input: string): string {
+    // Convert single newlines to markdown hard breaks ("two spaces  newline"),
+    // while preserving blank lines and avoiding changes inside fenced code blocks.
+    const s = (input || '').replace(/\r\n/g, '\n');
+    const lines = s.split('\n');
+
+    let inFence = false;
+    const out: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Toggle on ``` fences (common case)
+      if (line.trim().startsWith('```')) {
+        inFence = !inFence;
+        out.push(line);
+        continue;
+      }
+
+      if (inFence) {
+        out.push(line);
+        continue;
+      }
+
+      // If the next line is blank, keep this line as-is so markdown makes a new paragraph.
+      const next = i + 1 < lines.length ? lines[i + 1] : null;
+      const nextIsBlank = next !== null && next.trim() === '';
+
+      if (line.trim() === '' || nextIsBlank) {
+        out.push(line);
+      } else {
+        // Add two spaces to force a hard line break
+        out.push(line + '  ');
+      }
+    }
+
+    return out.join('\n');
+  }
+
   const [tool, setTool] = useState<Tool>('job_fit');
   const [resumeMode, setResumeMode] = useState<'upload' | 'paste'>('upload');
 
   const [resumeText, setResumeText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [output, setOutput] = useState('');
+  const [streamComplete, setStreamComplete] = useState(false);
+  const [outputView, setOutputView] = useState<'markdown' | 'raw'>('markdown');
 
   const [status, setStatus] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -480,6 +522,10 @@ export default function AiToolsClient() {
   const [isRunning, setIsRunning] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
+
+  const renderedOutput = useMemo(() => {
+    return output ? toHardBreakMarkdown(output) : '';
+  }, [output]);
 
   const canRun = useMemo(() => {
     if (isRunning || isExtracting) return false;
@@ -602,6 +648,8 @@ export default function AiToolsClient() {
     setIsRunning(true);
     setStatus('Running…');
     setOutput('');
+    setStreamComplete(false);
+    setOutputView('raw');
 
     try {
       const res = await apiFetch('/app-api/ai/evaluate', user, {
@@ -642,6 +690,8 @@ export default function AiToolsClient() {
         }
       }
 
+      setStreamComplete(true);
+      setOutputView('markdown');
       setStatus('Done.');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Unknown error running tool.';
@@ -655,6 +705,8 @@ export default function AiToolsClient() {
     abortRef.current?.abort();
     abortRef.current = null;
     setIsRunning(false);
+    setStreamComplete(true);
+    setOutputView('markdown');
     setStatus('Stopped.');
   }
 
@@ -837,26 +889,59 @@ export default function AiToolsClient() {
         <div className="card space-y-4 p-5">
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-lg font-semibold">Output</h3>
-            <button
-              type="button"
-              className="btn-outline"
-              onClick={() => setOutput('')}
-              disabled={!output || isRunning}
-            >
-              Clear
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className={outputView === 'markdown' ? 'btn-primary' : 'btn-outline'}
+                onClick={() => setOutputView('markdown')}
+                disabled={!output}
+              >
+                Markdown
+              </button>
+              <button
+                type="button"
+                className={outputView === 'raw' ? 'btn-primary' : 'btn-outline'}
+                onClick={() => setOutputView('raw')}
+                disabled={!output}
+              >
+                Raw
+              </button>
+              <button
+                type="button"
+                className="btn-outline"
+                onClick={() => setOutput('')}
+                disabled={!output || isRunning}
+              >
+                Clear
+              </button>
+            </div>
           </div>
 
           <div className="rounded-md border border-accent/30 bg-background p-4">
-            <pre className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+            {/* <pre className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
               {output || 'Run a tool (or load the demo) to see output here.'}
-            </pre>
-          </div>
+            </pre> */}
 
-          <p className="text-xs text-muted">
-            Output is markdown text streamed from the backend. In v2, we can store runs and show
-            history.
-          </p>
+            {/* {output ? (
+              <Markdown markdown={renderedOutput} />
+            ) : (
+              <p className="text-sm text-muted">
+                Run a tool (or load the demo) to see output here.
+              </p>
+            )} */}
+
+            {!output ? (
+              <p className="text-sm text-muted">
+                Run a tool (or load the demo) to see output here.
+              </p>
+            ) : outputView === 'raw' ? (
+              <pre className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                {output}
+              </pre>
+            ) : (
+              <Markdown markdown={output} />
+            )}
+          </div>
         </div>
       </section>
     </div>
