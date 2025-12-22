@@ -170,7 +170,6 @@ export default function SiteNav() {
       {/* Desktop: hover/focus tab that slides the nav out from the side */}
       <div
         className="hidden lg:block"
-        onMouseEnter={() => setDesktopOpen(true)}
         onMouseLeave={() => setDesktopOpen(false)}
         onFocusCapture={() => setDesktopOpen(true)}
         onBlurCapture={handleDesktopBlur}
@@ -185,6 +184,7 @@ export default function SiteNav() {
               type="button"
               aria-label={desktopOpen ? 'Hide navigation' : 'Show navigation'}
               className={`absolute -left-12 top-6 flex h-12 w-12 items-center justify-center rounded-l-lg border ${NAV_BORDER} ${NAV_SURFACE} text-foreground shadow-md transition-colors hover:border-primary-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue`}
+              onMouseEnter={() => setDesktopOpen(true)}
               onClick={() => setDesktopOpen((open) => !open)}
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary-green to-primary-blue text-xs font-semibold uppercase text-background">
