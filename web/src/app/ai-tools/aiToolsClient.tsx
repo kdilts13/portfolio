@@ -468,52 +468,12 @@ Focus your efforts on JOB 1 and JOB 2 as both offer a strong match to your exper
 export default function AiToolsClient() {
   const { user } = useAuth();
 
-  function toHardBreakMarkdown(input: string): string {
-    // Convert single newlines to markdown hard breaks ("two spaces  newline"),
-    // while preserving blank lines and avoiding changes inside fenced code blocks.
-    const s = (input || '').replace(/\r\n/g, '\n');
-    const lines = s.split('\n');
-
-    let inFence = false;
-    const out: string[] = [];
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-
-      // Toggle on ``` fences (common case)
-      if (line.trim().startsWith('```')) {
-        inFence = !inFence;
-        out.push(line);
-        continue;
-      }
-
-      if (inFence) {
-        out.push(line);
-        continue;
-      }
-
-      // If the next line is blank, keep this line as-is so markdown makes a new paragraph.
-      const next = i + 1 < lines.length ? lines[i + 1] : null;
-      const nextIsBlank = next !== null && next.trim() === '';
-
-      if (line.trim() === '' || nextIsBlank) {
-        out.push(line);
-      } else {
-        // Add two spaces to force a hard line break
-        out.push(line + '  ');
-      }
-    }
-
-    return out.join('\n');
-  }
-
   const [tool, setTool] = useState<Tool>('job_fit');
   const [resumeMode, setResumeMode] = useState<'upload' | 'paste'>('upload');
 
   const [resumeText, setResumeText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [output, setOutput] = useState('');
-  const [streamComplete, setStreamComplete] = useState(false);
   const [outputView, setOutputView] = useState<'markdown' | 'raw'>('markdown');
 
   const [status, setStatus] = useState<string | null>(null);
@@ -522,10 +482,6 @@ export default function AiToolsClient() {
   const [isRunning, setIsRunning] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
-
-  const renderedOutput = useMemo(() => {
-    return output ? toHardBreakMarkdown(output) : '';
-  }, [output]);
 
   const canRun = useMemo(() => {
     if (isRunning || isExtracting) return false;
@@ -648,7 +604,6 @@ export default function AiToolsClient() {
     setIsRunning(true);
     setStatus('Running…');
     setOutput('');
-    setStreamComplete(false);
     setOutputView('raw');
 
     try {
@@ -690,7 +645,6 @@ export default function AiToolsClient() {
         }
       }
 
-      setStreamComplete(true);
       setOutputView('markdown');
       setStatus('Done.');
     } catch (e) {
@@ -705,7 +659,6 @@ export default function AiToolsClient() {
     abortRef.current?.abort();
     abortRef.current = null;
     setIsRunning(false);
-    setStreamComplete(true);
     setOutputView('markdown');
     setStatus('Stopped.');
   }
@@ -918,18 +871,6 @@ export default function AiToolsClient() {
           </div>
 
           <div className="rounded-md border border-accent/30 bg-background p-4">
-            {/* <pre className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-              {output || 'Run a tool (or load the demo) to see output here.'}
-            </pre> */}
-
-            {/* {output ? (
-              <Markdown markdown={renderedOutput} />
-            ) : (
-              <p className="text-sm text-muted">
-                Run a tool (or load the demo) to see output here.
-              </p>
-            )} */}
-
             {!output ? (
               <p className="text-sm text-muted">
                 Run a tool (or load the demo) to see output here.
