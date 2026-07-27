@@ -13,6 +13,10 @@ Thumbs.db
 *.swo
 .swc/
 
+# Root tooling dependencies / cache
+node_modules/
+.nx/
+
 # Env files (never commit real secrets)
 .env
 .env.*

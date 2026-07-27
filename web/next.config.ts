@@ -1,9 +1,15 @@
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { NextConfig } from 'next';
 
 const API_TARGET = process.env.API_PROXY_TARGET ?? 'http://localhost:8080';
+const appRoot = dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  turbopack: {
+    root: appRoot,
+  },
 
   async rewrites() {
     return [
