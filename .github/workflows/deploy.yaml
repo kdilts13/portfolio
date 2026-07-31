@@ -36,6 +36,8 @@ jobs:
               - '.github/workflows/deploy.yaml'
             web:
               - 'web/**'
+              - 'package.json'
+              - 'package-lock.json'
               - '.github/workflows/deploy.yaml'
               - 'firebase.json'
               - 'firestore.rules'
@@ -156,15 +158,13 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install web dependencies
-        working-directory: web
         run: npm ci
 
       - name: Run web unit tests
-        working-directory: web
-        run: npm test
+        run: npm run test --workspace=web
 
   build_deploy_web:
     if: needs.changes.outputs.web == 'true'
@@ -224,11 +224,10 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: package-lock.json
 
       # Install deps & build Next.js with NEXT_PUBLIC_* env baked in
       - name: Install deps and build web
-        working-directory: web
         env:
           API_BASE: ${{ steps.apiurl.outputs.API_URL }}
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
@@ -240,7 +239,7 @@ jobs:
           NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID }}
         run: |
           npm ci
-          npm run build
+          npm run build --workspace=web
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -248,7 +247,8 @@ jobs:
       - name: Build & Push WEB (runtime only)
         uses: docker/build-push-action@v6
         with:
-          context: ./web
+          context: .
+          file: web/Dockerfile
           push: true
           tags: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.WEB_IMAGE }}:latest
           cache-from: type=gha

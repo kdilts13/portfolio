@@ -5,22 +5,19 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm test",
-        "cwd": "web"
+        "command": "npm run test --workspace=web"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run build",
-        "cwd": "web"
+        "command": "npm run build --workspace=web"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run lint",
-        "cwd": "web"
+        "command": "npm run lint --workspace=web"
       }
     }
   }
