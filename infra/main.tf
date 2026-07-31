@@ -28,6 +28,27 @@ resource "google_artifact_registry_repository" "apps" {
   lifecycle {
     prevent_destroy = true
   }
+
+  cleanup_policy_dry_run = false
+
+  cleanup_policies {
+    id     = "delete-old-versions"
+    action = "DELETE"
+
+    condition {
+      tag_state  = "ANY"
+      older_than = "86400s"
+    }
+  }
+
+  cleanup_policies {
+    id     = "keep-latest"
+    action = "KEEP"
+
+    most_recent_versions {
+      keep_count = 10
+    }
+  }
 }
 
 # Runtime service accounts (Cloud Run)
