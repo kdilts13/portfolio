@@ -15,8 +15,6 @@ env:
   AR_REPO: ${{ vars.AR_REPO }}
   WEB_IMAGE: ${{ vars.WEB_IMAGE }}
   API_IMAGE: ${{ vars.API_IMAGE }}
-  APP_AI_ENABLED: ${{ vars.APP_AI_ENABLED }}
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
 jobs:
   changes:
@@ -44,7 +42,6 @@ jobs:
               - '.firebaserc'
             infra:
               - 'infra/**'
-              - '.github/workflows/deploy.yaml'
 
   tfsec:
     name: tfsec
@@ -143,8 +140,7 @@ jobs:
           gcloud run deploy api \
             --image="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$API_IMAGE:latest" \
             --region="$GCP_REGION" \
-            --service-account="run-api@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
-            --set-env-vars="APP_AI_ENABLED=$APP_AI_ENABLED,APP_OPENAI_API_KEY=$OPENAI_API_KEY"
+            --service-account="run-api@$GCP_PROJECT_ID.iam.gserviceaccount.com"
 
   test_web:
     if: needs.changes.outputs.web == 'true'
