@@ -68,6 +68,30 @@ resource "google_service_account" "run_web" {
   }
 }
 
+# Secret Manager container for the portfolio API's OpenAI key.
+# The secret value itself is added separately with gcloud so it is not stored
+# in Terraform state.
+resource "google_secret_manager_secret" "openai_api_key" {
+  secret_id = "portfolio-api-openai-key"
+
+  replication {
+    auto {}
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  depends_on = [google_project_service.services]
+}
+
+# Allow the Cloud Run API runtime service account to read the secret.
+resource "google_secret_manager_secret_iam_member" "openai_api_key_accessor" {
+  secret_id = google_secret_manager_secret.openai_api_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.run_api.email}"
+}
+
 # Grant Firestore access to API runtime
 resource "google_project_iam_member" "api_datastore_user" {
   project = var.project_id
@@ -102,6 +126,22 @@ resource "google_cloud_run_v2_service" "api" {
       env {
         name  = "SPRING_PROFILES_ACTIVE"
         value = "prod"
+      }
+
+      env {
+        name  = "APP_AI_ENABLED"
+        value = "true"
+      }
+
+      env {
+        name = "APP_OPENAI_API_KEY"
+
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.openai_api_key.secret_id
+            version = "latest"
+          }
+        }
       }
     }
   }
