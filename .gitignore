@@ -43,6 +43,9 @@ node_modules/
 # Local docker override (optional)
 docker-compose.override.yml
 
+# Terraform plan files
+**/tfplan*
+
 
 ############################################################
 # WEB (Next.js / Node / TypeScript)

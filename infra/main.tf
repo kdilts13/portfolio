@@ -92,6 +92,12 @@ resource "google_secret_manager_secret_iam_member" "openai_api_key_accessor" {
   member    = "serviceAccount:${google_service_account.run_api.email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "openai_api_key_deployer_admin" {
+  secret_id = google_secret_manager_secret.openai_api_key.id
+  role      = "roles/secretmanager.admin"
+  member    = "serviceAccount:${var.deployer_sa}"
+}
+
 # Grant Firestore access to API runtime
 resource "google_project_iam_member" "api_datastore_user" {
   project = var.project_id

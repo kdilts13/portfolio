@@ -21,3 +21,8 @@ variable "api_image" {
   type    = string
   default = "api"
 }
+
+variable "deployer_sa" {
+  type        = string
+  description = "Service account email used by GitHub Actions for Terraform"
+}

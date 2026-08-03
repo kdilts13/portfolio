@@ -15,6 +15,7 @@ env:
   AR_REPO: ${{ vars.AR_REPO }}
   WEB_IMAGE: ${{ vars.WEB_IMAGE }}
   API_IMAGE: ${{ vars.API_IMAGE }}
+  TF_VAR_deployer_sa: ${{ vars.DEPLOYER_SA }}
 
 jobs:
   changes:
