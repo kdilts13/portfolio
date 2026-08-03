@@ -1,6 +1,6 @@
 services:
   emulators:
-    image: node:20-alpine
+    image: node:24-alpine
     container_name: emulators
     working_dir: /workspace
     volumes:

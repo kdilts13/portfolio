@@ -1,5 +1,5 @@
 # Simple runtime image: Next.js has already been built in CI
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 
 ENV NODE_ENV=production
 WORKDIR /app
