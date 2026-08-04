@@ -1,20 +1,14 @@
 services:
   emulators:
-    image: node:24-alpine
+    build:
+      context: .
+      dockerfile: firebase-emulator.Dockerfile
+    image: portfolio-emulators:dev
     container_name: emulators
     working_dir: /workspace
     volumes:
       - ./:/workspace
       - ./.firebase/data:/.firebase/data
-    command: >
-      sh -lc "npm i -g firebase-tools &&
-              firebase emulators:start
-              --config ./firebase.json
-              --only \"auth,firestore\"
-              --project portfolio-dev
-              --import ./.firebase/data
-              --export-on-exit
-              --ui"
     ports:
       - "4000:4000" # Emulator UI
       - "8081:8081" # Firestore

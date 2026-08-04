@@ -30,18 +30,22 @@ public class SecurityConfig {
 
                 // Endpoints that require *approved* users
                 // .requestMatchers().hasRole("APPROVED")
+            .dispatcherTypeMatchers(
+                DispatcherType.ASYNC,
+                DispatcherType.ERROR
+            ).permitAll()
 
-                // Fallback for other API calls: must be authenticated at least
-                .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
-                .requestMatchers("/api/me").authenticated()
-                .requestMatchers("/api/ai/**").authenticated()
-                .requestMatchers("/api/**").authenticated()
+            .requestMatchers("/actuator/health").permitAll()
 
-                // Reject actuator requests
-                .requestMatchers("/actuator/**").denyAll()
+            .requestMatchers("/api/me").authenticated()
+            .requestMatchers("/api/ai/**").authenticated()
+            .requestMatchers("/api/**").authenticated()
 
-                // Everything else (non-API) is public
-                .anyRequest().permitAll()
+            // Reject actuator requests
+            .requestMatchers("/actuator/**").denyAll()
+
+            // Everything else (non-API) is public
+            .anyRequest().permitAll()
             )
             .addFilterBefore(firebaseAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
