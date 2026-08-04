@@ -24,7 +24,8 @@ node_modules/
 
 # Editor metadata
 .idea/
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 
 # Generic compiled artifacts
 *.class

@@ -1,0 +1,115 @@
+// {
+//   "version": "2.0.0",
+//   "tasks": [
+//     {
+//       "label": "Run Firestore Emulator",
+//       "type": "process",
+//       "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+//       "args": [
+//         "-NoExit",
+//         "-Command",
+//         "Write-Host 'JAVA_HOME:' $env:JAVA_HOME; Write-Host 'Java locations on PATH:'; where.exe java; Write-Host 'Resolved Java version:'; java -version; firebase.cmd emulators:start --project kd-portfolio-prod --import ./.firebase/data --export-on-exit"
+//       ],
+//       "options": {
+//         "cwd": "${workspaceFolder}",
+//         "env": {
+//           "JAVA_HOME": "C:\\Program Files\\Java\\jdk-21.0.12",
+//           "PATH": "C:\\Program Files\\Java\\jdk-21.0.12\\bin;${env:PATH}"
+//         }
+//       },
+//       "isBackground": true,
+//       "problemMatcher": []
+//     },
+//     {
+//       "label": "Run API",
+//       "type": "process",
+//       "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+//       "args": [
+//         "-NoExit",
+//         "-Command",
+//         "Write-Host 'JAVA_HOME:' $env:JAVA_HOME; Write-Host 'Java locations on PATH:'; where.exe java; Write-Host 'Resolved Java version:'; java -version; Set-Location api; .\\mvnw.cmd --version; .\\mvnw.cmd spring-boot:run"
+//       ],
+//       "options": {
+//         "cwd": "${workspaceFolder}",
+//         "env": {
+//           "JAVA_HOME": "C:\\Program Files\\Java\\jdk-21.0.12",
+//           "PATH": "C:\\Program Files\\Java\\jdk-21.0.12\\bin;${env:PATH}",
+//           "FIRESTORE_EMULATOR_HOST": "127.0.0.1:8081",
+//           "FIREBASE_AUTH_EMULATOR_HOST": "127.0.0.1:9099",
+//           "GOOGLE_CLOUD_PROJECT": "kd-portfolio-prod",
+//           "SPRING_PROFILES_ACTIVE": "local"
+//         }
+//       },
+//       "isBackground": true,
+//       "problemMatcher": []
+//     },
+//     {
+//       "label": "Run Web",
+//       "type": "process",
+//       "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+//       "args": ["-NoExit", "-Command", "Set-Location web; npm run dev"],
+//       "options": {
+//         "cwd": "${workspaceFolder}"
+//       },
+//       "isBackground": true,
+//       "problemMatcher": []
+//     },
+//     {
+//       "label": "Run All (Emulator + API + Web)",
+//       "dependsOrder": "parallel",
+//       "dependsOn": ["Run Firestore Emulator", "Run API", "Run Web"],
+//       "runOptions": {
+//         "runOn": "folderOpen"
+//       },
+//       "problemMatcher": []
+//     }
+//   ]
+// }
+
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Firestore Emulator",
+      "type": "shell",
+      "command": "firebase emulators:start --project kd-portfolio-prod --import ./.firebase/data --export-on-exit",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Run API",
+      "type": "shell",
+      "command": "./mvnw.cmd spring-boot:run",
+      "options": {
+        "cwd": "${workspaceFolder}/api",
+        "env": {
+          "FIRESTORE_EMULATOR_HOST": "127.0.0.1:8081",
+          "FIREBASE_AUTH_EMULATOR_HOST": "127.0.0.1:9099",
+          "GOOGLE_CLOUD_PROJECT": "kd-portfolio-prod",
+          "SPRING_PROFILES_ACTIVE": "local"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Web",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/web"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Run All (Emulator + API + Web)",
+      "dependsOrder": "parallel",
+      "dependsOn": ["Run Firestore Emulator", "Run API", "Run Web"],
+      "problemMatcher": []
+    }
+  ]
+}
