@@ -13,6 +13,7 @@ try {
     }
 
     gcloud secrets versions add portfolio-api-openai-key `
+        --project=kd-portfolio-prod `
         --data-file="$tempPath"
 
     if ($LASTEXITCODE -ne 0) {
@@ -20,6 +21,7 @@ try {
     }
 
     gcloud run services update api `
+        --project=kd-portfolio-prod `
         --region=us-central1 `
         --update-secrets=APP_OPENAI_API_KEY=portfolio-api-openai-key:latest
 
