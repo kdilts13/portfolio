@@ -65,7 +65,7 @@ export default function ActiveWorkoutPage() {
             </header>
 
             <section
-              className="space-y-3"
+              className="space-y-4"
               aria-label={`${workout.routineName} workout exercises`}
             >
               {workout.exercises.map((exercise) => (

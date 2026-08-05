@@ -29,11 +29,11 @@ export function ExerciseDetailCard({
         </div>
 
         <div className="min-w-0 flex-1 space-y-3">
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <div className="flex items-start gap-3">
             <h3 className="min-w-0 text-base font-semibold leading-6">
               {exercise.name}
             </h3>
-            <span className="justify-self-end rounded-md border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            <span className="ml-auto shrink-0 rounded-md border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground">
               {formatTarget(exercise)}
             </span>
           </div>

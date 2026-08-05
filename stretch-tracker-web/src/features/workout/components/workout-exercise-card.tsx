@@ -25,7 +25,7 @@ export function WorkoutExerciseCard({ exercise }: WorkoutExerciseCardProps) {
           : 'rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm sm:p-5'
       }
     >
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+      <div className="flex items-start gap-3">
         <div className="min-w-0 space-y-2">
           <h3 className="text-base font-semibold leading-6">{exercise.name}</h3>
           <p className="text-sm text-muted-foreground">
@@ -33,7 +33,7 @@ export function WorkoutExerciseCard({ exercise }: WorkoutExerciseCardProps) {
           </p>
         </div>
 
-        <span className="justify-self-end rounded-md border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground">
+        <span className="ml-auto shrink-0 rounded-md border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground">
           {formatTarget(exercise)}
         </span>
       </div>
