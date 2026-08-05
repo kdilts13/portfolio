@@ -25,10 +25,10 @@ function formatLastCompleted(lastCompletedAt: Routine['lastCompletedAt']) {
 
 export function RoutineCard({ routine, onView, onStart }: RoutineCardProps) {
   return (
-    <article className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
+    <article className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm sm:p-5">
       <div className="flex flex-col gap-4">
         <div className="space-y-2">
-          <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="flex flex-col items-start gap-2 sm:flex-row sm:justify-between">
             <h3 className="text-base font-semibold leading-6">{routine.name}</h3>
             <span className="rounded-md border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground">
               v{routine.version}
@@ -48,14 +48,14 @@ export function RoutineCard({ routine, onView, onStart }: RoutineCardProps) {
           <Button
             type="button"
             variant="outline"
-            className="w-full sm:w-auto"
+            className="h-10 w-full sm:w-auto"
             onClick={onView}
           >
             View
           </Button>
           <Button
             type="button"
-            className="w-full sm:w-auto"
+            className="h-10 w-full sm:w-auto"
             onClick={onStart}
           >
             Start Workout

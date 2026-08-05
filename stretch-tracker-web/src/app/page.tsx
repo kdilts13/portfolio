@@ -10,11 +10,11 @@ export default function Page() {
   const { data: routines, error, isError, isLoading } = useRoutines();
 
   return (
-    <main className="min-h-screen bg-background px-4 py-10 text-foreground sm:px-6 sm:py-14">
+    <main className="min-h-screen bg-background px-4 py-12 text-foreground sm:px-6 sm:py-16">
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-normal">
+            <h1 className="text-3xl font-semibold tracking-normal sm:text-4xl">
               My Routines
             </h1>
             <p className="max-w-md text-sm text-muted-foreground">
@@ -22,7 +22,7 @@ export default function Page() {
             </p>
           </div>
 
-          <Button type="button" className="w-full sm:w-auto">
+          <Button type="button" size="lg" className="w-full sm:w-auto">
             New Routine
           </Button>
         </header>
