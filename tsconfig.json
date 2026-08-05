@@ -5,6 +5,9 @@
   "references": [
     {
       "path": "./stretch-tracker-web"
+    },
+    {
+      "path": "./stretch-tracker-api"
     }
   ]
 }
