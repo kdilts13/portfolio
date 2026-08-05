@@ -47,6 +47,8 @@ docker-compose.override.yml
 # Terraform plan files
 **/tfplan*
 
+**/.next
+**/next-env.d.ts
 
 ############################################################
 # WEB (Next.js / Node / TypeScript)
